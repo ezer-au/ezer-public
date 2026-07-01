@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Diagnosis · Ezer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Noto+Serif+Hebrew:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #F5F1E8;
+    --cream-deep: #EDE6D6;
+    --ink: #2B2924;
+    --ink-soft: #5C574C;
+    --clay: #B5643C;
+    --clay-deep: #9A5230;
+    --sage-label: #7C8471;
+    --line: #DDD4C2;
+    --white-warm: #FBF9F3;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .serif { font-family: 'Fraunces', Georgia, serif; }
+  .hebrew { font-family: 'Noto Serif Hebrew', serif; }
+  #root { min-height: 100vh; display: flex; flex-direction: column; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--clay); outline-offset: 2px;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade { animation: fadeUp 0.4s ease both; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 4px;
+    background: var(--cream-deep);
+    border-radius: 2px; outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--thumb-color, var(--clay));
+    cursor: pointer;
+    border: 3px solid var(--white-warm);
+    box-shadow: 0 0 0 1.5px var(--thumb-color, var(--clay));
+    transition: transform 0.15s ease;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  input[type=range]::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--thumb-color, var(--clay)); cursor: pointer;
+    border: 3px solid var(--white-warm);
+    box-shadow: 0 0 0 1.5px var(--thumb-color, var(--clay));
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useMemo, useContext, createContext } = React;
+
+const EZER = { contactEmail: "hello@ezer.au", submitEndpoint: null };
+
+/* ─── ACCENT CONTEXT ─── */
+const AccentContext = createContext("#B5643C");
+function useAccent() { return useContext(AccentContext); }
+
+/* ─── MODULE ACCENT COLOURS ─── */
+const MODULE_ACCENTS = {
+  comms:      { main: "#B5643C", deep: "#9A5230" }, // terracotta
+  admin:      { main: "#7C8C6E", deep: "#637055" }, // sage green
+  tech:       { main: "#6B8FA8", deep: "#527490" }, // dusty blue
+  compliance: { main: "#A8893A", deep: "#8A6F2C" }, // warm ochre
+  pastoral:   { main: "#9A7090", deep: "#7D5874" }, // muted mauve
+};
+
+/* ─── MODULE DEFINITIONS ─── */
+const MODULES = [
+  {
+    id: "comms",
+    name: "Communications",
+    triageLabel: "Communications",
+    triageDesc: "newsletters, social media, getting the word out",
+    insight: {
+      accentDeep: "#9A5230",
+      eyebrow: "Communications · Context",
+      statDisplay: "45",
+      animateFrom: 0, animateTo: 45,
+      statSuffix: "%",
+      headline: "Almost half of Australians say they're open to conversations about faith.",
+      body: "Churches are closer to their communities than most organisations — but the gap between being present and being findable is real. Globally, 70% of Christians say their church could benefit from better social media outreach. The question most churches carry quietly: does our communication reflect who we are, or just what's on this Sunday?",
+      source: "McCrindle, An Undercurrent of Faith, 2025 · Barna/Gloo, State of the Church, 2024 (global research)",
+    },
+    diagnosticQ: {
+      id: "comms_reach",
+      text: "When something important needs to reach the whole church, how confident are you it actually lands?",
+      type: "single",
+      options: [
+        { label: "Very — we reach nearly everyone", value: 1 },
+        { label: "Fairly — most people, most of the time", value: 2 },
+        { label: "Patchy — it's hit and miss", value: 3 },
+        { label: "Not confident at all", value: 4 },
+      ],
+    },
+    deepQs: [
+      {
+        id: "comms_tools",
+        text: "What does your church currently use to communicate with people?",
+        hint: "Select everything that applies.",
+        type: "multi",
+        options: [
+          "Mailchimp / email newsletter tool",
+          "Manual email (writing and sending yourself)",
+          "Facebook / Instagram",
+          "Church app (Planning Center, Elvanto, etc.)",
+          "WhatsApp or group chat",
+          "Weekly bulletin / printed sheet",
+          "Website updates",
+          "Word of mouth",
+          "We don't really have a system",
+        ],
+      },
+      {
+        id: "comms_friction",
+        text: "How much does getting the word out each week cost you in time and energy?",
+        type: "slider",
+        low: "Barely notice it",
+        high: "It's one of my biggest drains",
+      },
+      {
+        id: "comms_feel",
+        text: "How do you feel about your church's communications right now?",
+        type: "single",
+        options: [
+          { label: "Proud of it", value: 1 },
+          { label: "It does the job", value: 2 },
+          { label: "A bit embarrassed, honestly", value: 3 },
+          { label: "It's on my list to fix", value: 4 },
+          { label: "I try not to think about it", value: 5 },
+        ],
+      },
+      {
+        id: "comms_vision",
+        text: "What would it look like if your church always knew what was happening, and felt connected between Sundays?",
+        type: "text",
+        optional: true,
+      },
+    ],
+  },
+  {
+    id: "admin",
+    name: "Admin & Scheduling",
+    triageLabel: "Admin & Scheduling",
+    triageDesc: "rosters, bookings, paperwork, records",
+    insight: {
+      accentDeep: "#637055",
+      eyebrow: "Admin & Scheduling · Context",
+      statDisplay: "54",
+      animateFrom: 0, animateTo: 54,
+      statSuffix: "%",
+      headline: "More than half of Australian senior church leaders rate their stress as high — up from 46% just five years ago.",
+      body: "In 2021, 3 in 10 Australian senior leaders had administration in their top three actual activities — but didn't believe it should be. The mismatch is structural, not personal. Ministry attracts people wired to serve people, not manage systems. As NCLS researcher Sam Sterland put it: leaders are feeling \"more effective, but more tired than ever.\"",
+      source: "NCLS Research, 2021 National Church Life Survey · Powell et al., NCLS Research, 2023",
+    },
+    diagnosticQ: {
+      id: "admin_systems",
+      text: "How are your rosters, bookings and records held together right now?",
+      type: "single",
+      options: [
+        { label: "A proper system everyone uses", value: 1 },
+        { label: "Spreadsheets that mostly work", value: 2 },
+        { label: "A mix of paper, memory and goodwill", value: 3 },
+        { label: "It's held together with hope", value: 4 },
+      ],
+    },
+    deepQs: [
+      {
+        id: "admin_tools",
+        text: "What does your church use to manage rosters, bookings and records?",
+        hint: "Select everything that applies.",
+        type: "multi",
+        options: [
+          "Planning Center",
+          "Elvanto / ChurchSuite",
+          "Google Sheets / Excel",
+          "Paper rosters and physical files",
+          "Email threads",
+          "Someone's memory",
+          "We don't really have a system",
+        ],
+      },
+      {
+        id: "admin_friction",
+        text: "How much of your week disappears into admin that isn't ministry?",
+        type: "slider",
+        low: "Barely a slice",
+        high: "It's swallowing the role",
+      },
+      {
+        id: "admin_feel",
+        text: "How do you feel about how your church handles admin right now?",
+        type: "single",
+        options: [
+          { label: "It runs smoothly", value: 1 },
+          { label: "It works but it's messy", value: 2 },
+          { label: "It depends on one person too much", value: 3 },
+          { label: "It causes me real stress", value: 4 },
+          { label: "I've stopped looking at it", value: 5 },
+        ],
+      },
+      {
+        id: "admin_vision",
+        text: "What would it look like if the admin just ran — without it landing on you?",
+        type: "text",
+        optional: true,
+      },
+    ],
+  },
+  {
+    id: "tech",
+    name: "Tech & Tools",
+    triageLabel: "Tech & Tools",
+    triageDesc: "website, AV, software, online giving",
+    insight: {
+      accentDeep: "#527490",
+      eyebrow: "Tech & Tools · Context",
+      statDisplay: "51",
+      animateFrom: 0, animateTo: 51,
+      statSuffix: "%",
+      headline: "Communication is the top challenge ministry leaders hope technology can better address.",
+      body: "Most churches arrive at their tech setup through good intentions, donated equipment, and one person who \"knows computers.\" Globally, 64% of churches believe an AI policy is important — but only 5% have one. There's no Australian research that maps church technical capacity in detail, which is itself telling. You're helping build the picture that doesn't yet exist.",
+      source: "Barna/Pushpay, State of Church Technology, 2025–2026 (global research)",
+    },
+    diagnosticQ: {
+      id: "tech_confidence",
+      text: "When something technical breaks — the website, the mailing list, the AV desk — how well-covered are you?",
+      type: "single",
+      options: [
+        { label: "We've got it handled", value: 1 },
+        { label: "One person knows how", value: 2 },
+        { label: "We muddle through", value: 3 },
+        { label: "We panic and pray", value: 4 },
+      ],
+    },
+    deepQs: [
+      {
+        id: "tech_tools",
+        text: "What tech does your church currently rely on week to week?",
+        hint: "Select everything that applies.",
+        type: "multi",
+        options: [
+          "Church website (WordPress, Squarespace, etc.)",
+          "Live streaming (YouTube, Boxcast, etc.)",
+          "Presentation software (ProPresenter, EasyWorship)",
+          "Church management software (Planning Center, Elvanto)",
+          "Online giving platform (Pushpay, Tithely, etc.)",
+          "Google Workspace / Microsoft 365",
+          "AV and sound desk",
+          "We keep it minimal",
+        ],
+      },
+      {
+        id: "tech_friction",
+        text: "When something technical breaks or needs updating, how does your church cope?",
+        type: "slider",
+        low: "We handle it easily",
+        high: "We panic and pray",
+      },
+      {
+        id: "tech_feel",
+        text: "How do you feel about your church's tech setup right now?",
+        type: "single",
+        options: [
+          { label: "Confident — it serves us well", value: 1 },
+          { label: "It works but we're patching as we go", value: 2 },
+          { label: "We're over-reliant on one person", value: 3 },
+          { label: "It's a source of ongoing stress", value: 4 },
+          { label: "We're behind and I know it", value: 5 },
+        ],
+      },
+      {
+        id: "tech_vision",
+        text: "What would it look like if your tech just worked — and your team felt confident running it?",
+        type: "text",
+        optional: true,
+      },
+    ],
+  },
+  {
+    id: "compliance",
+    name: "Compliance",
+    triageLabel: "Compliance",
+    triageDesc: "Working With Children checks, insurance, policies, reporting",
+    insight: {
+      accentDeep: "#8A6F2C",
+      eyebrow: "Compliance · Context",
+      statDisplay: "50",
+      animateFrom: 0, animateTo: 50,
+      statSuffix: "%",
+      headline: "More than half of Australian charities operate without paid staff.",
+      body: "Every registered charity in Australia must meet ACNC Governance Standards as a condition of staying registered. In most churches, compliance responsibility lands on the same two or three people carrying everything else. Child safe standards are now legislated across most Australian states and territories, with new frameworks rolling out from 2023–2025. This isn't an area where \"we'll get to it\" is a safe posture — but it's also not one you should navigate alone.",
+      source: "ACNC Annual Report 2024–25 · National Council of Churches in Australia, 2025",
+    },
+    diagnosticQ: {
+      id: "compliance_confidence",
+      text: "How confident are you that your church's compliance obligations — Working With Children, insurance, financial reporting — are being met?",
+      type: "single",
+      options: [
+        { label: "Very confident", value: 1 },
+        { label: "Fairly confident", value: 2 },
+        { label: "I have some concerns", value: 3 },
+        { label: "I genuinely don't know", value: 4 },
+      ],
+    },
+    deepQs: [
+      {
+        id: "compliance_tools",
+        text: "What does your church currently use to manage compliance?",
+        hint: "Things like Working With Children checks, insurance, policies and financial reporting. Select everything that applies.",
+        type: "multi",
+        options: [
+          "A dedicated compliance or governance tool",
+          "Spreadsheets or shared documents",
+          "Our denomination handles most of it",
+          "One person manages it informally",
+          "Paper files",
+          "We have an accountant or bookkeeper",
+          "Honestly, I'm not sure what we have",
+        ],
+      },
+      {
+        id: "compliance_friction",
+        text: "How much mental load does compliance and governance place on you personally?",
+        type: "slider",
+        low: "Barely think about it",
+        high: "It keeps me up at night",
+      },
+      {
+        id: "compliance_feel",
+        text: "How do you feel about where your church sits on compliance right now?",
+        type: "single",
+        options: [
+          { label: "Confident — we're across it", value: 1 },
+          { label: "Mostly okay but there are gaps I know about", value: 2 },
+          { label: "I suspect there are gaps I don't know about", value: 3 },
+          { label: "It worries me more than I let on", value: 4 },
+          { label: "I don't know enough to answer that honestly", value: 5 },
+        ],
+      },
+      {
+        id: "compliance_vision",
+        text: "What would it mean to you to know your church was fully covered — legally, financially, and structurally?",
+        type: "text",
+        optional: true,
+      },
+    ],
+  },
+  {
+    id: "pastoral",
+    name: "Pastoral Care",
+    triageLabel: "Pastoral Care",
+    triageDesc: "follow-up, member support, knowing who needs care",
+    insight: {
+      accentDeep: "#7D5874",
+      eyebrow: "Pastoral Care · Context",
+      statDisplay: "40",
+      animateFrom: 0, animateTo: 40,
+      statSuffix: "%",
+      headline: "More than 40% of Australians have experienced a mental health disorder at some point in their life.",
+      body: "That's not a statistic that stays outside your church doors on Sunday. At the same time, research consistently shows that belonging matters — 87% of church attenders report a strong sense of belonging, and 79% found it easy to make friends. Churches do community better than most organisations on earth. The question is whether the infrastructure behind the scenes is protecting the people doing that work, or slowly wearing them down.",
+      source: "ABS, National Study of Mental Health and Wellbeing, 2022 · NCLS Research, 2021",
+    },
+    diagnosticQ: {
+      id: "pastoral_confidence",
+      text: "How confident are you that the people in your church who need pastoral support are being reached?",
+      type: "single",
+      options: [
+        { label: "Very confident", value: 1 },
+        { label: "Mostly — but I know there are gaps", value: 2 },
+        { label: "Not very — we're stretched thin", value: 3 },
+        { label: "People are falling through and I feel it", value: 4 },
+      ],
+    },
+    deepQs: [
+      {
+        id: "pastoral_tools",
+        text: "How does your church currently keep track of who needs pastoral care or follow-up?",
+        hint: "Select everything that applies.",
+        type: "multi",
+        options: [
+          "Church management software (Planning Center, Elvanto)",
+          "A shared spreadsheet or doc",
+          "Personal notes or a private diary",
+          "WhatsApp or group chat with the team",
+          "Regular team meetings or verbal handoffs",
+          "The pastor carries it",
+          "We don't have a formal system",
+        ],
+      },
+      {
+        id: "pastoral_friction",
+        text: "How often do people fall through the cracks — missing a follow-up, not hearing from anyone for too long?",
+        type: "slider",
+        low: "Almost never",
+        high: "More often than I'm comfortable with",
+      },
+      {
+        id: "pastoral_feel",
+        text: "How do you feel about the pastoral care your church is able to provide right now?",
+        type: "single",
+        options: [
+          { label: "We're doing well — people feel cared for", value: 1 },
+          { label: "We try hard but we're stretched", value: 2 },
+          { label: "There are people I know we're missing", value: 3 },
+          { label: "It weighs on me more than most things", value: 4 },
+          { label: "I've had to make peace with doing less than I want to", value: 5 },
+        ],
+      },
+      {
+        id: "pastoral_vision",
+        text: "What would it look like if no one in your church felt unseen — and your team felt equipped to carry the care together?",
+        type: "text",
+        optional: true,
+      },
+    ],
+  },
+];
+
+/* ─── SHARED STYLES (accent-aware versions are inline) ─── */
+const inputStyle = {
+  width: "100%", padding: "0.8rem 1rem", marginBottom: "0.8rem",
+  border: "1.5px solid var(--line)", borderRadius: 8, fontSize: "1rem",
+  fontFamily: "inherit", color: "var(--ink)", background: "var(--cream)",
+};
+
+function btnPrimary(accent) {
+  return {
+    background: accent, color: "var(--white-warm)", border: "none",
+    padding: "0.85rem 2rem", fontSize: "1rem", fontWeight: 600,
+    fontFamily: "inherit", borderRadius: 8, cursor: "pointer",
+    transition: "background 0.2s ease",
+  };
+}
+const btnGhost = {
+  background: "transparent", color: "var(--ink)", border: "1.5px solid var(--line)",
+  padding: "0.85rem 2rem", fontSize: "1rem", fontWeight: 600,
+  fontFamily: "inherit", borderRadius: 8, cursor: "pointer",
+};
+
+/* ─── WORDMARK ─── */
+function Wordmark({ size = "large" }) {
+  const accent = useAccent();
+  const dims = size === "large"
+    ? { word: "clamp(3.4rem, 12vw, 6.5rem)", heb: "clamp(4.5rem, 17vw, 9rem)" }
+    : { word: "1.9rem", heb: "2.6rem" };
+  return (
+    <div style={{ position: "relative", display: "inline-block", lineHeight: 1 }}>
+      <span className="hebrew" aria-hidden="true" style={{
+        position: "absolute", top: "50%", left: "50%",
+        transform: "translate(-50%, -42%)",
+        fontSize: dims.heb, color: accent, opacity: 0.14,
+        fontWeight: 500, letterSpacing: "0.05em",
+        whiteSpace: "nowrap", pointerEvents: "none",
+      }}>עֵזֶר</span>
+      <span className="serif" style={{
+        position: "relative", fontSize: dims.word, fontWeight: 600,
+        letterSpacing: "0.14em", color: "var(--ink)",
+      }}>EZER</span>
+    </div>
+  );
+}
+
+/* ─── PROGRESS BAR ─── */
+function Progress({ current, total, moduleName }) {
+  const accent = useAccent();
+  const pct = Math.round((current / total) * 100);
+  return (
+    <div style={{ maxWidth: 640, margin: "0 auto", padding: "0 1.5rem", width: "100%" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.6rem" }}>
+        <span style={{ fontSize: "0.78rem", letterSpacing: "0.12em", textTransform: "uppercase", color: accent, fontWeight: 600 }}>{moduleName}</span>
+        <span style={{ fontSize: "0.82rem", color: "var(--ink-soft)" }}>{current} of {total}</span>
+      </div>
+      <div style={{ height: 4, background: "var(--cream-deep)", borderRadius: 2, overflow: "hidden" }}>
+        <div style={{ height: "100%", width: pct + "%", background: accent, borderRadius: 2, transition: "width 0.4s ease" }} />
+      </div>
+    </div>
+  );
+}
+
+/* ─── INTRO ─── */
+function Intro({ onStart }) {
+  const accent = useAccent();
+  return (
+    <div className="fade" style={{ maxWidth: 640, margin: "0 auto", padding: "clamp(2rem, 8vh, 6rem) 1.5rem", textAlign: "center" }}>
+      <div style={{ marginBottom: "3rem" }}><Wordmark size="large" /></div>
+      <p className="serif" style={{ fontSize: "clamp(1.5rem, 4vw, 2.1rem)", fontWeight: 500, lineHeight: 1.4, marginBottom: "1.6rem" }}>
+        The thing nobody warns you about is the administration.
+      </p>
+      <p style={{ fontSize: "1.08rem", color: "var(--ink-soft)", marginBottom: "1.2rem" }}>
+        The emails that pile up. The systems nobody fully understands. The Sunday prep that somehow always takes until Saturday night.
+      </p>
+      <p style={{ fontSize: "1.08rem", color: "var(--ink-soft)", marginBottom: "2.6rem" }}>
+        You came here to pastor people — and somewhere, that got crowded out.
+      </p>
+      <div style={{ borderTop: "1px solid var(--line)", paddingTop: "2.4rem" }}>
+        <p style={{ fontSize: "0.82rem", letterSpacing: "0.14em", textTransform: "uppercase", color: accent, fontWeight: 600, marginBottom: "0.8rem" }}>The Diagnosis</p>
+        <p style={{ fontSize: "1rem", color: "var(--ink-soft)", marginBottom: "2rem" }}>
+          Tell us where the weight sits. We'll tell you what we see. Five minutes — no sign-up to see your results.
+        </p>
+        <button onClick={onStart} style={btnPrimary(accent)}>Begin</button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── TRIAGE ─── */
+function Triage({ onNext }) {
+  const accent = useAccent();
+  const [selected, setSelected] = useState([]);
+
+  const toggle = (id) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id)
+        : prev.length < 3 ? [...prev, id] : prev
+    );
+  };
+
+  return (
+    <div className="fade" style={{ maxWidth: 640, margin: "0 auto", padding: "clamp(2rem, 6vh, 4rem) 1.5rem", width: "100%" }}>
+      <p className="serif" style={{ fontSize: "clamp(1.4rem, 4vw, 1.9rem)", fontWeight: 500, lineHeight: 1.4, marginBottom: "0.6rem" }}>
+        Where are you feeling the weight right now?
+      </p>
+      <p style={{ fontSize: "0.95rem", color: "var(--ink-soft)", marginBottom: "2rem" }}>
+        Pick up to 3 areas — we'll go deeper on the ones that matter most to you.
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.7rem", marginBottom: "2rem" }}>
+        {MODULES.map((m) => {
+          const isSelected = selected.includes(m.id);
+          const isDisabled = !isSelected && selected.length >= 3;
+          const moduleAccent = MODULE_ACCENTS[m.id].main;
+          return (
+            <button
+              key={m.id}
+              onClick={() => toggle(m.id)}
+              disabled={isDisabled}
+              style={{
+                display: "flex", alignItems: "flex-start", gap: "1rem",
+                textAlign: "left", padding: "1rem 1.2rem",
+                border: "1.5px solid " + (isSelected ? moduleAccent : "var(--line)"),
+                borderRadius: 10, fontSize: "1rem", fontFamily: "inherit",
+                color: isDisabled ? "var(--ink-soft)" : "var(--ink)",
+                cursor: isDisabled ? "not-allowed" : "pointer",
+                background: isSelected ? "var(--white-warm)" : "transparent",
+                opacity: isDisabled ? 0.45 : 1,
+                transition: "border-color 0.2s ease, background 0.2s ease",
+              }}
+            >
+              <span style={{
+                width: 20, height: 20, borderRadius: 4, flexShrink: 0, marginTop: 2,
+                border: "2px solid " + (isSelected ? moduleAccent : "var(--line)"),
+                background: isSelected ? moduleAccent : "transparent",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "all 0.2s ease",
+              }}>
+                {isSelected && (
+                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                    <path d="M1 4l3 3 5-6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </span>
+              <div>
+                <div style={{ fontWeight: 600, marginBottom: "0.1rem", color: isSelected ? moduleAccent : "var(--ink)" }}>{m.triageLabel}</div>
+                <div style={{ fontSize: "0.88rem", color: "var(--ink-soft)" }}>{m.triageDesc}</div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+        <button
+          onClick={() => onNext(selected)}
+          style={{ ...btnPrimary(accent), opacity: selected.length === 0 ? 0.4 : 1, cursor: selected.length === 0 ? "not-allowed" : "pointer" }}
+          disabled={selected.length === 0}
+        >
+          Continue
+        </button>
+        {selected.length > 0 && (
+          <span style={{ fontSize: "0.88rem", color: "var(--ink-soft)" }}>
+            {selected.length} of 3 selected
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── MULTI SELECT ─── */
+function MultiSelect({ q, initial, onNext }) {
+  const accent = useAccent();
+  const [chosen, setChosen] = useState(initial ?? []);
+  const toggle = (opt) => setChosen((prev) =>
+    prev.includes(opt) ? prev.filter((x) => x !== opt) : [...prev, opt]
+  );
+  return (
+    <div className="fade" style={{ maxWidth: 640, margin: "0 auto", padding: "clamp(1.5rem, 5vh, 3.5rem) 1.5rem", width: "100%" }}>
+      <p className="serif" style={{ fontSize: "clamp(1.3rem, 3.5vw, 1.75rem)", fontWeight: 500, lineHeight: 1.4, marginBottom: q.hint ? "0.5rem" : "1.8rem" }}>
+        {q.text}
+      </p>
+      {q.hint && <p style={{ fontSize: "0.92rem", color: "var(--ink-soft)", marginBottom: "1.6rem" }}>{q.hint}</p>}
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", marginBottom: "2rem" }}>
+        {q.options.map((opt) => {
+          const isChosen = chosen.includes(opt);
+          return (
+            <button key={opt} onClick={() => toggle(opt)} style={{
+              display: "flex", alignItems: "center", gap: "0.9rem",
+              textAlign: "left", padding: "0.85rem 1.1rem",
+              border: "1.5px solid " + (isChosen ? accent : "var(--line)"),
+              borderRadius: 9, fontSize: "0.98rem", fontFamily: "inherit",
+              color: "var(--ink)", cursor: "pointer",
+              background: isChosen ? "var(--white-warm)" : "transparent",
+              transition: "border-color 0.2s ease, background 0.2s ease",
+            }}>
+              <span style={{
+                width: 18, height: 18, borderRadius: 4, flexShrink: 0,
+                border: "2px solid " + (isChosen ? accent : "var(--line)"),
+                background: isChosen ? accent : "transparent",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "all 0.15s ease",
+              }}>
+                {isChosen && (
+                  <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
+                    <path d="M1 4l3 3 5-6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </span>
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+      <button onClick={() => onNext(chosen)} disabled={chosen.length === 0}
+        style={{ ...btnPrimary(accent), opacity: chosen.length === 0 ? 0.4 : 1, cursor: chosen.length === 0 ? "not-allowed" : "pointer" }}>
+        Next
+      </button>
+    </div>
+  );
+}
+
+/* ─── SINGLE SELECT ─── */
+function SingleSelect({ q, initial, onNext, isLast }) {
+  const accent = useAccent();
+  const [chosen, setChosen] = useState(initial ?? null);
+  return (
+    <div className="fade" style={{ maxWidth: 640, margin: "0 auto", padding: "clamp(1.5rem, 5vh, 3.5rem) 1.5rem", width: "100%" }}>
+      <p className="serif" style={{ fontSize: "clamp(1.3rem, 3.5vw, 1.75rem)", fontWeight: 500, lineHeight: 1.4, marginBottom: "1.8rem" }}>
+        {q.text}
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", marginBottom: "2rem" }}>
+        {q.options.map((opt) => {
+          const isChosen = chosen === opt.value;
+          return (
+            <button key={opt.value} onClick={() => setChosen(opt.value)} style={{
+              display: "flex", alignItems: "center", gap: "0.9rem",
+              textAlign: "left", padding: "0.85rem 1.1rem",
+              border: "1.5px solid " + (isChosen ? accent : "var(--line)"),
+              borderRadius: 9, fontSize: "0.98rem", fontFamily: "inherit",
+              color: "var(--ink)", cursor: "pointer",
+              background: isChosen ? "var(--white-warm)" : "transparent",
+              transition: "border-color 0.2s ease, background 0.2s ease",
+            }}>
+              <span style={{
+                width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
+                border: "2px solid " + (isChosen ? accent : "var(--line)"),
+                background: isChosen ? accent : "transparent",
+                transition: "all 0.15s ease",
+              }} />
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
+      <button onClick={() => onNext(chosen)} disabled={chosen === null}
+        style={{ ...btnPrimary(accent), opacity: chosen === null ? 0.4 : 1, cursor: chosen === null ? "not-allowed" : "pointer" }}>
+        {isLast ? "See my results" : "Next"}
+      </button>
+    </div>
+  );
+}
+
+/* ─── SLIDER ─── */
+// Zone thresholds: 1-3 = low, 4-6 = mid, 7-10 = high
+// Each question supplies low/mid/high reflection sentences via sliderZones
+function getSliderZone(val) {
+  if (val <= 3) return "low";
+  if (val <= 6) return "mid";
+  return "high";
+}
+
+// Zone colours: tinted versions that sit between cream and the accent
+function zoneColor(accent, zone) {
+  // Low = near-cream, mid = accent at 40% opacity feel, high = accent
+  if (zone === "low") return "var(--cream-deep)";
+  if (zone === "mid") return accent + "88"; // ~53% opacity hex
+  return accent;
+}
+
+function SliderQ({ q, initial, onNext }) {
+  const accent = useAccent();
+  const [val, setVal] = useState(initial ?? 5);
+  const pct = ((val - 1) / 9) * 100;
+  const zone = getSliderZone(val);
+
+  // Zone reflection sentences — keyed to q.id
+  const ZONE_REFLECTIONS = {
+    comms_friction: {
+      low:  "It sounds like comms isn't costing you much — that's worth holding onto.",
+      mid:  "It sounds like it's noticeable — not overwhelming, but present.",
+      high: "It sounds like this is one of the heavier things you're carrying.",
+    },
+    admin_friction: {
+      low:  "It sounds like admin isn't eating much of your time — good.",
+      mid:  "It sounds like there's a real chunk going to admin. That adds up.",
+      high: "It sounds like admin has become the role rather than part of it.",
+    },
+    tech_friction: {
+      low:  "It sounds like your team handles tech with confidence.",
+      mid:  "It sounds like tech is manageable, but it's not invisible.",
+      high: "It sounds like tech is a genuine source of stress when things go wrong.",
+    },
+    compliance_friction: {
+      low:  "It sounds like compliance isn't weighing on you day to day.",
+      mid:  "It sounds like it sits in the back of your mind more than you'd like.",
+      high: "It sounds like this is something that genuinely keeps you up.",
+    },
+    pastoral_friction: {
+      low:  "It sounds like your follow-up is mostly landing — that's a real gift.",
+      mid:  "It sounds like there are gaps you're aware of but can't always close.",
+      high: "It sounds like this is one of the things that weighs on you most.",
+    },
+  };
+
+  const reflections = ZONE_REFLECTIONS[q.id] ?? {
+    low: "It sounds like this is mostly under control.",
+    mid: "It sounds like this is somewhere in the middle — noticeable but not overwhelming.",
+    high: "It sounds like this is one of the heavier things on your plate.",
+  };
+
+  const reflection = reflections[zone];
+
+  // Segment the track into 3 coloured zones
+  const lowPct  = Math.min(pct, 22);   // positions 1–3
+  const midPct  = Math.min(Math.max(pct - 22, 0), 33); // positions 4–6
+  const highPct = Math.max(pct - 55, 0); // positions 7–10
+
+  return (
+    <div className="fade" style={{ maxWidth: 640, margin: "0 auto", padding: "clamp(1.5rem, 5vh, 3.5rem) 1.5rem", width: "100%" }}>
+      <p className="serif" style={{ fontSize: "clamp(1.3rem, 3.5vw, 1.75rem)", fontWeight: 500, lineHeight: 1.4, marginBottom: "3rem" }}>
+        {q.text}
+      </p>
+      <div style={{ marginBottom: "1.2rem" }}>
+        <input
+          type="range" min="1" max="10" value={val}
+          onChange={(e) => setVal(Number(e.target.value))}
+          style={{
+            "--thumb-color": accent,
+            background: `linear-gradient(to right,
+              ${accent} ${pct}%,
+              var(--cream-deep) ${pct}%)`,
+          }}
+        />
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.7rem" }}>
+          <span style={{ fontSize: "0.82rem", color: "var(--ink-soft)", maxWidth: "45%", lineHeight: 1.3 }}>{q.low}</span>
+          <span style={{ fontSize: "0.82rem", color: "var(--ink-soft)", maxWidth: "45%", textAlign: "right", lineHeight: 1.3 }}>{q.high}</span>
+        </div>
+      </div>
+
+      {/* Live zone reflection */}
+      <div style={{
+        minHeight: "3.2rem",
+        marginBottom: "2.4rem",
+        padding: "0.9rem 1.1rem",
+        borderRadius: 8,
+        background: zone === "low" ? "var(--cream-deep)" : zone === "mid" ? accent + "18" : accent + "22",
+        borderLeft: `3px solid ${zone === "low" ? "var(--line)" : accent}`,
+        transition: "background 0.3s ease, border-color 0.3s ease",
+      }}>
+        <p style={{
+          fontSize: "0.96rem",
+          color: zone === "low" ? "var(--ink-soft)" : "var(--ink)",
+          fontStyle: "italic",
+          lineHeight: 1.5,
+          transition: "color 0.3s ease",
+        }}>
+          {reflection}
+        </p>
+      </div>
+
+      <button onClick={() => onNext(val)} style={btnPrimary(accent)}>Next</button>
+    </div>
+  );
+}
+
+/* ─── FREE TEXT ─── */
+// ALPHA FEEDBACK POINT: Test whether pastors engage with this question or skip it.
+// Key questions: (1) What % fill it in? (2) Does it slow or stop completion?
+// (3) Is the content useful enough to justify the friction?
+// Review after Prospect Alpha run before Beta build.
+function TextQ({ q, initial, onNext, isLast }) {
+  const accent = useAccent();
+  const [val, setVal] = useState(initial ?? "");
+  return (
+    <div className="fade" style={{ maxWidth: 640, margin: "0 auto", padding: "clamp(1.5rem, 5vh, 3.5rem) 1.5rem", width: "100%" }}>
+      <p style={{ fontSize: "0.78rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--sage-label)", fontWeight: 600, marginBottom: "0.8rem" }}>
+        Optional
+      </p>
+      <p className="serif" style={{ fontSize: "clamp(1.3rem, 3.5vw, 1.75rem)", fontWeight: 500, lineHeight: 1.4, marginBottom: "1.8rem" }}>
+        {q.text}
+      </p>
+      <textarea
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
+        placeholder="Take as much or as little space as you need…"
+        rows={4}
+        style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6, marginBottom: "1.5rem", minHeight: 100 }}
+      />
+      <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+        <button onClick={() => onNext(val || null)} style={btnPrimary(accent)}>
+          {isLast ? "See my results" : "Next"}
+        </button>
+        {!val && (
+          <button onClick={() => onNext(null)} style={{ background: "none", border: "none", color: "var(--ink-soft)", fontSize: "0.9rem", fontFamily: "inherit", textDecoration: "underline", textUnderlineOffset: "3px", cursor: "pointer" }}>
+            Skip
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── MODULE INSIGHT (replaces Selah) ─── */
+const { useEffect, useRef } = React;
+
+function ModuleInsight({ insight, onContinue }) {
+  const accent = useAccent();
+  const accentDeep = insight.accentDeep || accent;
+
+  // Animate the big stat number counting up
+  const countRef = useRef(null);
+  const [displayed, setDisplayed] = React.useState(insight.animateFrom ?? insight.statRaw);
+  const [lineVisible, setLineVisible] = React.useState(false);
+  const [bodyVisible, setBodyVisible] = React.useState(false);
+  const [sourceVisible, setSourceVisible] = React.useState(false);
+  const [btnVisible, setBtnVisible] = React.useState(false);
+
+  useEffect(() => {
+    // Stagger: line → body → source → button
+    const t1 = setTimeout(() => setLineVisible(true), 200);
+    const t2 = setTimeout(() => setBodyVisible(true), 600);
+    const t3 = setTimeout(() => setSourceVisible(true), 1000);
+    const t4 = setTimeout(() => setBtnVisible(true), 1300);
+
+    // Count-up animation for numeric stats
+    if (insight.animateFrom !== undefined && insight.animateTo !== undefined) {
+      const duration = 900;
+      const start = performance.now();
+      const from = insight.animateFrom;
+      const to = insight.animateTo;
+      const isFloat = !Number.isInteger(to);
+      const step = (now) => {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = from + (to - from) * eased;
+        setDisplayed(isFloat ? current.toFixed(1) : Math.round(current));
+        if (progress < 1) requestAnimationFrame(step);
+        else setDisplayed(insight.statDisplay);
+      };
+      const raf = requestAnimationFrame(step);
+      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); cancelAnimationFrame(raf); };
+    }
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+  }, []);
+
+  const fadeIn = (visible, delay = 0) => ({
+    opacity: visible ? 1 : 0,
+    transform: visible ? "translateY(0)" : "translateY(8px)",
+    transition: "opacity 0.5s ease, transform 0.5s ease",
+  });
+
+  return (
+    <div style={{
+      maxWidth: 600,
+      margin: "0 auto",
+      padding: "clamp(2rem, 7vh, 4.5rem) 1.5rem",
+      width: "100%",
+    }}>
+      {/* Card */}
+      <div style={{
+        background: "var(--white-warm)",
+        border: "1px solid var(--line)",
+        borderTop: `4px solid ${accent}`,
+        borderRadius: 12,
+        padding: "clamp(1.8rem, 5vw, 2.8rem)",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        {/* Background Hebrew watermark */}
+        <span className="hebrew" aria-hidden="true" style={{
+          position: "absolute", bottom: "-1rem", right: "-0.5rem",
+          fontSize: "8rem", color: accent, opacity: 0.055,
+          fontWeight: 500, lineHeight: 1, pointerEvents: "none",
+          userSelect: "none",
+        }}>עֵזֶר</span>
+
+        {/* Eyebrow label */}
+        <p style={{
+          fontSize: "0.72rem", letterSpacing: "0.18em",
+          textTransform: "uppercase", color: accent,
+          fontWeight: 600, marginBottom: "1.4rem",
+        }}>
+          {insight.eyebrow}
+        </p>
+
+        {/* Big stat */}
+        <div className="serif" style={{
+          fontSize: "clamp(3rem, 12vw, 5rem)",
+          fontWeight: 600, color: accent, lineHeight: 1,
+          marginBottom: "0.5rem",
+        }}>
+          {insight.statPrefix || ""}{displayed}{insight.statSuffix || ""}
+        </div>
+
+        {/* Divider line — animated */}
+        <div style={{
+          height: 2, background: accent, opacity: 0.18,
+          marginBottom: "1.4rem", transformOrigin: "left",
+          transform: lineVisible ? "scaleX(1)" : "scaleX(0)",
+          transition: "transform 0.6s ease",
+        }} />
+
+        {/* Pull quote / headline */}
+        <p className="serif" style={{
+          fontSize: "clamp(1.15rem, 3vw, 1.4rem)",
+          fontWeight: 500, lineHeight: 1.45,
+          color: "var(--ink)", marginBottom: "1rem",
+          ...fadeIn(bodyVisible),
+        }}>
+          {insight.headline}
+        </p>
+
+        {/* Body copy */}
+        <p style={{
+          fontSize: "0.98rem", color: "var(--ink-soft)",
+          lineHeight: 1.7, marginBottom: "1.6rem",
+          ...fadeIn(bodyVisible),
+        }}>
+          {insight.body}
+        </p>
+
+        {/* Source citation */}
+        <p style={{
+          fontSize: "0.75rem", color: "var(--ink-soft)",
+          opacity: sourceVisible ? 0.65 : 0,
+          transition: "opacity 0.5s ease",
+          fontStyle: "italic",
+          marginBottom: 0,
+          borderTop: "1px solid var(--line)",
+          paddingTop: "1rem",
+        }}>
+          {insight.source}
+        </p>
+      </div>
+
+      {/* Continue button */}
+      <div style={{
+        marginTop: "1.8rem", textAlign: "center",
+        ...fadeIn(btnVisible),
+      }}>
+        <button onClick={onContinue} style={btnPrimary(accent)}>
+          Continue
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── RESULTS LOGIC ─── */
+
+// Score each module: higher = more friction/need
+function scoreModules(answers, selectedModules) {
+  const scores = {};
+  MODULES.forEach((m) => {
+    const isDeep = selectedModules.includes(m.id);
+    const qs = isDeep ? m.deepQs : [m.diagnosticQ];
+    let sum = 0, count = 0;
+    qs.forEach((q) => {
+      const val = answers[q.id];
+      if (val != null && typeof val === "number") { sum += val; count++; }
+    });
+    if (count > 0) scores[m.id] = { id: m.id, name: m.name, avg: sum / count, isDeep };
+  });
+  return Object.values(scores).sort((a, b) => b.avg - a.avg);
+}
+
+// Read the friction slider value for a module (returns 1–10 or null)
+function frictionVal(answers, moduleId) {
+  return answers[moduleId + "_friction"] ?? null;
+}
+
+// Read the honest-feel answer for a module (returns option value or null)
+function feelVal(answers, moduleId) {
+  return answers[moduleId + "_feel"] ?? null;
+}
+
+// Per-module: derive a one-paragraph observation from their actual answers
+function moduleObservation(moduleId, answers, isDeep) {
+  const friction = frictionVal(answers, moduleId);
+  const feel = feelVal(answers, moduleId);
+
+  const frictionHigh = friction !== null && friction >= 7;
+  const frictionMid  = friction !== null && friction >= 4 && friction < 7;
+  const frictionLow  = friction !== null && friction < 4;
+
+  if (moduleId === "comms") {
+    const reach = answers["comms_reach"];
+    if (!isDeep) {
+      if (reach >= 3) return "You said getting the word out is hit and miss — that's one of the quietest drains in a pastor's week. People miss things, and you carry the blame.";
+      return "Communications sounds mostly under control for you.";
+    }
+    if (frictionHigh && feel >= 3) return "You're spending real energy on communications every week, and you're not happy with what it produces. That's a double cost — the hours, and the gap between effort and result.";
+    if (frictionHigh) return "Communications is costing you a lot of time. Even if you're satisfied with the output, that energy could be going somewhere else.";
+    if (frictionMid && feel >= 3) return "There's a gap between the effort you put into comms and how you feel about it. That's worth looking at — often it means the system, not the person, needs to change.";
+    if (feel >= 4) return "You flagged some honest discomfort with your church's communications. That instinct is worth trusting.";
+    if (frictionLow && feel <= 2) return "Communications sounds like it's mostly working for you — worth holding onto.";
+    return "There are some friction points in your communications that are worth naming.";
+  }
+
+  if (moduleId === "admin") {
+    const systems = answers["admin_systems"];
+    if (!isDeep) {
+      if (systems >= 3) return "Admin held together by memory and goodwill is a risk — not because the people aren't capable, but because it all falls apart the moment someone's unavailable.";
+      return "Your admin systems sound reasonably solid.";
+    }
+    if (frictionHigh && feel >= 3) return "Admin is swallowing the role, and you feel it. This is the pattern we see most often — capable pastors slowly buried under the weight of things that were never meant to be theirs.";
+    if (frictionHigh) return "Admin is taking up a significant slice of your week. Even if the systems work, that's hours away from ministry.";
+    if (feel >= 4) return "You said admin causes you real stress, or you've stopped looking at it. Either signal matters — one is pressure, the other is a system that's been quietly abandoned.";
+    if (frictionMid) return "Admin isn't overwhelming, but it's present — enough to notice, enough to chip away at the week.";
+    return "Admin sounds manageable for now, but worth keeping an eye on as you grow.";
+  }
+
+  if (moduleId === "tech") {
+    const confidence = answers["tech_confidence"];
+    if (!isDeep) {
+      if (confidence >= 3) return "You said you muddle through or panic when tech breaks. One-person dependencies are the norm in churches — but the day that person is unavailable, everything stops.";
+      return "Your tech coverage sounds reasonably solid.";
+    }
+    if (frictionHigh && feel >= 3) return "Tech is a genuine source of stress for you, and it breaks confidence when things go wrong. That's a systems problem, not a people problem.";
+    if (feel === 3) return "You flagged that you're over-reliant on one person for tech. That's the most common and most fragile setup we see — everything is fine until it isn't.";
+    if (feel >= 4) return "You're behind on tech and you know it. That self-awareness is actually the hardest part — the fixing is more straightforward than it feels.";
+    if (frictionMid) return "Tech is manageable day to day, but not invisible. There are gaps worth closing before they become urgent.";
+    return "Tech sounds mostly under control — a few things worth tidying, but no emergency.";
+  }
+
+  if (moduleId === "compliance") {
+    const confidence = answers["compliance_confidence"];
+    if (!isDeep) {
+      if (confidence >= 3) return "You said you have concerns or genuinely don't know where your compliance sits. In a registered charity, that uncertainty itself is a risk worth addressing.";
+      return "You sound reasonably confident about compliance — that's worth protecting.";
+    }
+    if (frictionHigh && feel >= 3) return "Compliance is keeping you up at night, and you suspect there are gaps you can't see. That combination is exactly when it's worth getting a clearer picture.";
+    if (feel === 3 || feel === 4) return "You suspect there are gaps, or it worries you more than you let on. Churches carrying compliance risk usually don't know it until something surfaces — getting across it now costs far less than fixing it later.";
+    if (feel === 5) return "You said you don't know enough to answer honestly — that's actually a useful signal. It means no one has given you a clear picture of your obligations, and that's fixable.";
+    if (frictionMid) return "Compliance sits in the back of your mind. That low-level worry is worth converting into a clear picture of what you actually need to do.";
+    return "Compliance sounds reasonably covered — worth a periodic review as legislation keeps shifting.";
+  }
+
+  if (moduleId === "pastoral") {
+    const confidence = answers["pastoral_confidence"];
+    if (!isDeep) {
+      if (confidence >= 3) return "You said people are falling through, or you're stretched too thin to reach everyone. That weight is one of the hardest parts of ministry — knowing there are gaps you can't close alone.";
+      return "Pastoral care sounds mostly covered for now.";
+    }
+    if (frictionHigh && feel >= 3) return "You're carrying the weight of people falling through, and you feel it. The gap between who your church is for and what you can actually deliver is one of the most painful places to sit in ministry.";
+    if (feel >= 3) return "You know there are people not being reached — either because you're stretched, or because the system doesn't surface who needs care. Both are solvable, but both need naming first.";
+    if (frictionMid) return "Pastoral care is mostly landing, but there are gaps you're aware of. The ones you know about are often the tip of a quieter pattern.";
+    return "Pastoral care sounds mostly solid. Worth protecting the infrastructure that makes it work.";
+  }
+
+  return "There are some things here worth looking at more closely.";
+}
+
+// Per-module: one practical next step derived from their answers
+function moduleNextStep(moduleId, answers, isDeep) {
+  const friction = frictionVal(answers, moduleId);
+  const feel = feelVal(answers, moduleId);
+
+  const steps = {
+    comms: [
+      { cond: () => feel >= 4, t: "Start with one channel", d: "Pick the one channel your people actually check, and make that excellent. Everything else is a distraction until that one works." },
+      { cond: () => friction >= 7, t: "Protect your comms time", d: "Block 90 minutes once a week for communications. Reactive comms always gets worse — a scheduled slot makes it manageable." },
+      { cond: () => true, t: "Audit what you're sending", d: "List every regular communication your church sends. For each one, ask: is this necessary, and who actually needs it?" },
+    ],
+    admin: [
+      { cond: () => feel >= 4, t: "Name what's yours and what isn't", d: "Write down everything admin you did last week. Circle what genuinely needs the pastor — it's probably less than you think." },
+      { cond: () => friction >= 7, t: "Find the one thing to hand off", d: "Pick the single most repeatable admin task you do each week. That's the first thing to document and delegate." },
+      { cond: () => true, t: "Check what's holding together", d: "Ask: if you were unavailable for two weeks, what would break? The answer tells you exactly where to start." },
+    ],
+    tech: [
+      { cond: () => feel === 3, t: "Map the dependency", d: "Write down every system that only one person knows how to run. That list is your risk register — start with whoever leaves soonest." },
+      { cond: () => feel >= 4, t: "Don't try to catch up all at once", d: "Pick one tech thing that's causing the most friction right now. Fix that. Then the next one. Trying to overhaul everything creates paralysis." },
+      { cond: () => true, t: "Do a tool audit", d: "List everything your church pays for or uses digitally. You'll likely find something you've forgotten about and something that could be replaced with something simpler." },
+    ],
+    compliance: [
+      { cond: () => feel >= 3, t: "Get a clear picture first", d: "You can't manage compliance you can't see. Start with an ACNC self-evaluation (free, online) to find out where you actually stand." },
+      { cond: () => friction >= 6, t: "Separate the urgent from the ongoing", d: "Some compliance obligations are one-off (policies, checks) and some are recurring (reporting, renewals). List them separately — the urgent list is almost always shorter than it feels." },
+      { cond: () => true, t: "Check your Working With Children status", d: "For most Australian churches, this is the single most time-sensitive compliance item. Make sure everyone who needs a check has a current one." },
+    ],
+    pastoral: [
+      { cond: () => feel >= 3, t: "Name who's invisible right now", d: "Think of three people in your church you haven't connected with in more than a month. That's your list for this week — not a system, just three names." },
+      { cond: () => friction >= 7, t: "Distribute the care", d: "You can't carry everyone. Identify two or three people in your congregation who are naturally caring and give them a small, named role in pastoral follow-up." },
+      { cond: () => true, t: "Close one loop this week", d: "Pick one person you've been meaning to follow up. Do it this week, before anything else. Sometimes the most important thing is also the most postponeable." },
+    ],
+  };
+
+  const moduleSteps = steps[moduleId] || [];
+  const matched = moduleSteps.find(s => s.cond());
+  return matched || { t: "Take one small step", d: "Identify the single most pressing thing in this area and address that first." };
+}
+
+/* ─── RESULTS ─── */
+function Results({ answers, selectedModules, onEmailSubmit, submitted }) {
+  const accent = useAccent();
+
+  const sortedModules = useMemo(() => scoreModules(answers, selectedModules), [answers, selectedModules]);
+  const topArea = sortedModules[0] ?? null;
+  const topAccent = topArea ? MODULE_ACCENTS[topArea.id].main : accent;
+
+  // Modules with a meaningful score to show (all that have any answers)
+  const scoredModules = sortedModules.filter(m => m.avg > 0);
+
+  // Headline signal: what did the top module's friction + feel actually say?
+  const topFriction = topArea ? frictionVal(answers, topArea.id) : null;
+  const topFeel = topArea ? feelVal(answers, topArea.id) : null;
+
+  // Derive a headline sentence that reflects what they actually said
+  const headlineSubtitle = useMemo(() => {
+    if (!topArea) return "Here are a few things worth reflecting on.";
+    const name = topArea.name.toLowerCase();
+    if (topFriction >= 8 && topFeel >= 4) return `You're spending a lot of energy on ${name} — and it's not sitting well. That combination is worth taking seriously.`;
+    if (topFriction >= 7) return `The time and energy going into ${name} is one of the heavier things you described today.`;
+    if (topFeel >= 4) return `Your gut feeling about ${name} is telling you something. That instinct is usually right.`;
+    if (topFeel === 3) return `There's honest discomfort sitting in ${name}. Worth naming clearly rather than carrying quietly.`;
+    return `${topArea.name} came out as the area with the most friction in what you shared today.`;
+  }, [topArea, topFriction, topFeel]);
+
+  const [email, setEmail] = useState("");
+  const [church, setChurch] = useState("");
+  const [err, setErr] = useState("");
+
+  const submit = () => {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErr("Please enter a valid email so we can send your summary.");
+      return;
+    }
+    setErr("");
+    onEmailSubmit({ email, church, answers, selectedModules });
+  };
+
+  return (
+    <div className="fade" style={{ maxWidth: 640, margin: "0 auto", padding: "clamp(2rem, 7vh, 5rem) 1.5rem", width: "100%" }}>
+
+      {/* Header */}
+      <p style={{ fontSize: "0.82rem", letterSpacing: "0.14em", textTransform: "uppercase", color: topAccent, fontWeight: 600, marginBottom: "1rem", textAlign: "center" }}>
+        Your Diagnosis
+      </p>
+      <h2 className="serif" style={{ fontSize: "clamp(1.7rem, 5vw, 2.4rem)", fontWeight: 500, lineHeight: 1.3, textAlign: "center", marginBottom: "1rem" }}>
+        {topArea
+          ? <>The heaviest weight looks like <span style={{ color: topAccent }}>{topArea.name.toLowerCase()}</span>.</>
+          : "Thank you for your honesty."}
+      </h2>
+      <p style={{ fontSize: "1.05rem", color: "var(--ink-soft)", textAlign: "center", marginBottom: "2.8rem", lineHeight: 1.65 }}>
+        {headlineSubtitle}
+      </p>
+
+      {/* Per-module observations */}
+      {scoredModules.length > 0 && (
+        <div style={{ marginBottom: "2.8rem" }}>
+          {scoredModules.map((m, i) => {
+            const mAccent = MODULE_ACCENTS[m.id].main;
+            const obs = moduleObservation(m.id, answers, m.isDeep);
+            const step = moduleNextStep(m.id, answers, m.isDeep);
+            return (
+              <div key={m.id} style={{
+                padding: "1.4rem 0",
+                borderBottom: i < scoredModules.length - 1 ? "1px solid var(--line)" : "none",
+              }}>
+                {/* Module label */}
+                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "0.6rem" }}>
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: mAccent, flexShrink: 0 }} />
+                  <span style={{ fontSize: "0.75rem", letterSpacing: "0.14em", textTransform: "uppercase", color: mAccent, fontWeight: 600 }}>
+                    {m.name}
+                  </span>
+                </div>
+                {/* Observation */}
+                <p style={{ fontSize: "0.98rem", color: "var(--ink)", lineHeight: 1.65, marginBottom: "0.9rem" }}>
+                  {obs}
+                </p>
+                {/* Next step */}
+                <div style={{ background: "var(--cream-deep)", borderRadius: 8, padding: "0.85rem 1rem", borderLeft: `3px solid ${mAccent}` }}>
+                  <p style={{ fontSize: "0.82rem", letterSpacing: "0.1em", textTransform: "uppercase", color: mAccent, fontWeight: 600, marginBottom: "0.25rem" }}>
+                    One thing this week
+                  </p>
+                  <p style={{ fontWeight: 600, fontSize: "0.95rem", marginBottom: "0.2rem" }}>{step.t}</p>
+                  <p style={{ fontSize: "0.92rem", color: "var(--ink-soft)", lineHeight: 1.55 }}>{step.d}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Email capture */}
+      {!submitted ? (
+        <div style={{ background: "var(--white-warm)", border: "1px solid var(--line)", borderRadius: 10, padding: "1.8rem 1.6rem" }}>
+          <p className="serif" style={{ fontSize: "1.25rem", fontWeight: 500, marginBottom: "0.5rem" }}>
+            Want a written summary — and a hand if you'd like one?
+          </p>
+          <p style={{ fontSize: "0.98rem", color: "var(--ink-soft)", marginBottom: "1.4rem" }}>
+            Pop your email in and we'll send your results plus a free AI-for-churches guide. No pressure, no sales pitch — you can just reply if you'd like to talk.
+          </p>
+          <input type="text" placeholder="Church name (optional)" value={church} onChange={(e) => setChurch(e.target.value)} style={inputStyle} />
+          <input type="email" placeholder="Your email" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
+          {err && <p style={{ color: "var(--clay)", fontSize: "0.88rem", marginBottom: "0.8rem" }}>{err}</p>}
+          <button onClick={submit} style={{ ...btnPrimary(topAccent), width: "100%" }}>Send me my summary</button>
+          <p style={{ fontSize: "0.85rem", color: "var(--ink-soft)", textAlign: "center", marginTop: "1.2rem" }}>
+            Prefer to reach out first? Email us any time at{" "}
+            <a href={"mailto:" + EZER.contactEmail} style={{ color: topAccent, fontWeight: 600 }}>{EZER.contactEmail}</a>
+          </p>
+        </div>
+      ) : (
+        <div style={{ background: "var(--white-warm)", border: "1px solid var(--line)", borderRadius: 10, padding: "2rem 1.6rem", textAlign: "center" }}>
+          <p className="serif" style={{ fontSize: "1.4rem", fontWeight: 500, marginBottom: "0.6rem" }}>It's on its way.</p>
+          <p style={{ fontSize: "1rem", color: "var(--ink-soft)" }}>
+            Check your inbox for your summary. We'll be in touch gently — and you're always welcome to reach us at{" "}
+            <a href={"mailto:" + EZER.contactEmail} style={{ color: topAccent, fontWeight: 600 }}>{EZER.contactEmail}</a>.
+          </p>
+          <div className="hebrew" style={{ fontSize: "2rem", color: topAccent, opacity: 0.5, marginTop: "1.6rem" }}>עֵזֶר</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── MAIN APP ─── */
+function App() {
+  const [stage, setStage] = useState("intro");
+  const [selectedModules, setSelectedModules] = useState([]);
+  const [answers, setAnswers] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const [qIdx, setQIdx] = useState(0);
+  const [showSelah, setShowSelah] = useState(false);
+
+  const questionSequence = useMemo(() => {
+    if (selectedModules.length === 0) return [];
+    return MODULES.flatMap((m) => {
+      const qs = selectedModules.includes(m.id) ? m.deepQs : [m.diagnosticQ];
+      return qs.map((q, qi) => ({
+        ...q,
+        moduleId: m.id,
+        moduleName: m.name,
+        isLastInModule: qi === qs.length - 1,
+        insight: m.insight,
+      }));
+    });
+  }, [selectedModules]);
+
+  const totalQ = questionSequence.length;
+  const currentQ = questionSequence[qIdx];
+
+  // Derive current accent from the active module
+  const currentAccent = useMemo(() => {
+    if (stage === "question" && currentQ) {
+      return MODULE_ACCENTS[currentQ.moduleId]?.main ?? "#B5643C";
+    }
+    return "#B5643C";
+  }, [stage, currentQ]);
+
+  const handleTriageNext = (sel) => {
+    setSelectedModules(sel);
+    setQIdx(0);
+    setShowSelah(false);
+    setStage("question");
+  };
+
+  const handleAnswer = (val) => {
+    setAnswers((prev) => ({ ...prev, [currentQ.id]: val }));
+    if (currentQ.isLastInModule) {
+      if (qIdx + 1 < totalQ) setShowSelah(true);
+      else setStage("results");
+    } else {
+      setQIdx(qIdx + 1);
+    }
+  };
+
+  const handleSelahContinue = () => {
+    setShowSelah(false);
+    setQIdx(qIdx + 1);
+  };
+
+  const emailSubmit = async (p) => {
+    if (EZER.submitEndpoint) {
+      try { await fetch(EZER.submitEndpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p) }); } catch (e) {}
+    }
+    console.log("Ezer submission:", p);
+    setSubmitted(true);
+  };
+
+  const isLastQ = qIdx + 1 >= totalQ;
+  const insightModule = currentQ ? MODULES.find((m) => m.id === currentQ.moduleId) : null;
+
+  const renderQuestion = () => {
+    const q = currentQ;
+    const initial = answers[q.id] ?? null;
+    const props = { q, initial, onNext: handleAnswer, isLast: isLastQ };
+    if (q.type === "multi") return <MultiSelect {...props} />;
+    if (q.type === "slider") return <SliderQ {...props} />;
+    if (q.type === "text") return <TextQ {...props} />;
+    return <SingleSelect {...props} />;
+  };
+
+  return (
+    <AccentContext.Provider value={currentAccent}>
+      {stage !== "intro" && (
+        <div style={{ padding: "1.4rem 1.5rem 0", display: "flex", justifyContent: "center" }}>
+          <Wordmark size="small" />
+        </div>
+      )}
+      <main style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", paddingBottom: "2rem" }}>
+        {stage === "intro" && <Intro onStart={() => setStage("triage")} />}
+        {stage === "triage" && <Triage onNext={handleTriageNext} />}
+        {stage === "question" && !showSelah && currentQ && (
+          <React.Fragment>
+            <div style={{ paddingTop: "1.5rem" }}>
+              <Progress current={qIdx + 1} total={totalQ} moduleName={currentQ.moduleName} />
+            </div>
+            {renderQuestion()}
+          </React.Fragment>
+        )}
+        {stage === "question" && showSelah && insightModule && (
+          <ModuleInsight insight={insightModule.insight} onContinue={handleSelahContinue} />
+        )}
+        {stage === "results" && (
+          <Results answers={answers} selectedModules={selectedModules} onEmailSubmit={emailSubmit} submitted={submitted} />
+        )}
+      </main>
+      <footer style={{ textAlign: "center", padding: "1.5rem", fontSize: "0.8rem", color: "var(--ink-soft)", borderTop: "1px solid var(--line)" }}>
+        Ezer · Helping churches steward what God has given.
+      </footer>
+    </AccentContext.Provider>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
