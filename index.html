@@ -1332,23 +1332,14 @@ function App() {
 
   const emailSubmit = async (p) => {
     try {
-      const { data, error } = await sb.from("leads").insert({
+      const { error } = await sb.from("leads").insert({
         email:   p.email,
         source:  "diagnosis-free",
         triage:  p.selectedModules ?? null,
         answers: { church: p.church ?? null, responses: p.answers ?? null }
       });
-      if (error) {
-        alert("SAVE FAILED\n\nmessage: " + (error.message || "(none)") +
-              "\ndetails: " + (error.details || "(none)") +
-              "\nhint: " + (error.hint || "(none)") +
-              "\ncode: " + (error.code || "(none)"));
-      } else {
-        alert("SAVED \u2713  Row written to leads.");
-      }
-    } catch (e) {
-      alert("JS / NETWORK ERROR\n\n" + (e && e.message ? e.message : String(e)));
-    }
+      if (error) console.error("EZER lead save failed:", error);
+    } catch (e) { console.error("EZER lead save failed:", e); }
     setSubmitted(true);
   };
 
