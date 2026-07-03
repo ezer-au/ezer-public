@@ -73,11 +73,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script type="text/babel">
 const { useState, useMemo, useContext, createContext } = React;
 
-const EZER = { contactEmail: "hello@ezer.au", submitEndpoint: null };
+const EZER = { contactEmail: "hello@ezerco.au", submitEndpoint: null };
+
+/* ─── SUPABASE (free front-door capture → leads) ─── */
+const SUPABASE_URL      = "https://uqzvjqnjjfwsivzfnexn.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_Dreg7hgeXiHi4ZFr8c-OQQ_aOhNt87y";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ─── ACCENT CONTEXT ─── */
 const AccentContext = createContext("#B5643C");
@@ -1325,10 +1331,15 @@ function App() {
   };
 
   const emailSubmit = async (p) => {
-    if (EZER.submitEndpoint) {
-      try { await fetch(EZER.submitEndpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p) }); } catch (e) {}
-    }
-    console.log("Ezer submission:", p);
+    try {
+      const { error } = await sb.from("leads").insert({
+        email:   p.email,
+        source:  "diagnosis-free",
+        triage:  p.selectedModules ?? null,
+        answers: { church: p.church ?? null, responses: p.answers ?? null }
+      });
+      if (error) console.error("EZER lead save failed:", error);
+    } catch (e) { console.error("EZER lead save failed:", e); }
     setSubmitted(true);
   };
 
