@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Using AI Well in Your Church — EZER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Noto+Serif+Hebrew:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F5F1E8;
+    --white-warm:#FBF9F3;
+    --ink:#2B2924;
+    --ink-soft:#5C574C;
+    --clay:#B5643C;
+    --line:#DDD4C2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} }
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:1.0625rem;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:640px;margin:0 auto;padding:0 1.5rem 4rem;}
+
+  /* ---------- header ---------- */
+  header{position:relative;text-align:center;padding:4.5rem 0 3rem;overflow:hidden;}
+  .hebrew-ghost{
+    position:absolute;top:0.25rem;left:50%;transform:translateX(-50%);
+    font-family:'Noto Serif Hebrew',serif;
+    font-size:9rem;line-height:1;
+    color:var(--ink);opacity:0.13;
+    user-select:none;pointer-events:none;
+  }
+  .wordmark{
+    position:relative;
+    font-family:'Fraunces',serif;
+    font-weight:500;font-size:1.5rem;
+    letter-spacing:0.14em;
+    padding-top:2.75rem;
+  }
+  h1{
+    position:relative;
+    font-family:'Fraunces',serif;
+    font-weight:600;font-size:2.35rem;line-height:1.2;
+    margin-top:2.25rem;
+    color:var(--ink);
+  }
+  .subtitle{
+    position:relative;
+    font-family:'Fraunces',serif;font-weight:400;font-style:italic;
+    font-size:1.2rem;color:var(--ink-soft);
+    margin-top:0.85rem;
+  }
+
+  /* ---------- prose ---------- */
+  section{margin-top:3.25rem;}
+  h2{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:1.55rem;line-height:1.3;
+    color:var(--clay);
+    margin-bottom:1.1rem;
+  }
+  p{margin-bottom:1.1rem;}
+  p:last-child{margin-bottom:0;}
+  strong{font-weight:600;color:var(--ink);}
+  em{font-style:italic;}
+  a{color:var(--clay);text-decoration:underline;text-underline-offset:3px;}
+  .lede{font-size:1.15rem;}
+  .aside{color:var(--ink-soft);font-size:0.95rem;}
+
+  .card{
+    background:var(--white-warm);
+    border:1px solid var(--line);
+    border-top:4px solid var(--clay);
+    border-radius:6px;
+    padding:1.6rem 1.75rem;
+    margin:1.4rem 0;
+  }
+  .card h3{
+    font-family:'Fraunces',serif;font-weight:600;font-size:1.1rem;
+    margin-bottom:0.5rem;
+  }
+
+  /* ---------- ground rules tear-out ---------- */
+  .tearline{
+    border:none;
+    border-top:2px dashed var(--line);
+    margin:3.25rem 0 0;
+    position:relative;
+  }
+  .tearline::after{
+    content:"✂ adapt this page and make it yours";
+    position:absolute;top:-0.85em;left:50%;transform:translateX(-50%);
+    background:var(--cream);
+    padding:0 0.75em;
+    font-size:0.8rem;letter-spacing:0.06em;text-transform:uppercase;
+    color:var(--ink-soft);white-space:nowrap;
+  }
+  .ground-rules{
+    background:var(--white-warm);
+    border:1px solid var(--line);
+    border-top:6px solid var(--clay);
+    border-radius:8px;
+    padding:2.4rem 2.3rem 2.1rem;
+    margin-top:2.4rem;
+    position:relative;overflow:hidden;
+  }
+  .ground-rules .hebrew-corner{
+    position:absolute;right:-0.5rem;bottom:-2.2rem;
+    font-family:'Noto Serif Hebrew',serif;
+    font-size:7rem;line-height:1;color:var(--ink);opacity:0.07;
+    user-select:none;pointer-events:none;
+  }
+  .ground-rules h2{
+    color:var(--ink);
+    font-size:1.7rem;
+    margin-bottom:0.4rem;
+  }
+  .ground-rules .gr-intro{
+    font-size:0.95rem;color:var(--ink-soft);font-style:italic;
+    margin-bottom:1.6rem;
+  }
+  .ground-rules ol{
+    list-style:none;counter-reset:rule;
+  }
+  .ground-rules li{
+    counter-increment:rule;
+    position:relative;
+    padding-left:2.4rem;
+    margin-bottom:1.15rem;
+  }
+  .ground-rules li::before{
+    content:counter(rule);
+    position:absolute;left:0;top:0.1em;
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:1.05rem;color:var(--clay);
+    width:1.7rem;text-align:right;
+  }
+  .ground-rules li strong{display:inline;}
+  .blank{
+    display:inline-block;min-width:9ch;
+    border-bottom:1.5px solid var(--clay);
+    padding:0 0.2em;
+    color:var(--clay);font-weight:500;
+    outline:none;
+  }
+  .blank:empty::before{content:attr(data-hint);color:var(--ink-soft);opacity:0.65;font-weight:400;}
+  .gr-agreed{
+    font-family:'Fraunces',serif;font-size:1.05rem;font-weight:500;
+    margin-bottom:1.4rem;
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    margin-top:4.5rem;
+    padding-top:1.75rem;
+    border-top:1px solid var(--line);
+    text-align:center;
+    font-size:0.9rem;color:var(--ink-soft);
+  }
+  footer .fmark{font-family:'Fraunces',serif;letter-spacing:0.14em;color:var(--ink);}
+
+  /* ---------- print ---------- */
+  @media print{
+    body{background:#fff;font-size:10.5pt;line-height:1.55;}
+    .page{max-width:100%;padding:0;}
+    header{padding:1.5rem 0 1rem;}
+    .hebrew-ghost{font-size:6rem;}
+    h1{font-size:20pt;margin-top:1.2rem;}
+    section{margin-top:1.6rem;}
+    h2{font-size:14pt;}
+    .card,.ground-rules{border-radius:0;box-shadow:none;}
+    .tearline{margin-top:1.5rem;}
+    .ground-rules{
+      break-before:page;
+      break-after:page;
+      page-break-before:always;
+      page-break-after:always;
+      padding:1.8rem 1.9rem;
+      margin-top:0;
+    }
+    .ground-rules li{margin-bottom:0.7rem;}
+    a{color:var(--ink);text-decoration:none;}
+    footer{margin-top:2rem;}
+  }
+  @page{margin:18mm;}
+
+  @media (max-width:480px){
+    h1{font-size:1.85rem;}
+    .hebrew-ghost{font-size:6.5rem;}
+    .ground-rules{padding:1.8rem 1.4rem 1.6rem;}
+    .ground-rules li{padding-left:2rem;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="hebrew-ghost" aria-hidden="true">עֵזֶר</div>
+  <div class="wordmark">EZER</div>
+  <h1>Using AI Well in Your Church</h1>
+  <p class="subtitle">A starting point for the curious and cautious</p>
+</header>
+
+<section>
+  <p class="lede"><strong>You don't have to use AI.</strong></p>
+  <p>That's worth saying first, because most of what you'll read about AI is trying to sell you something. This guide isn't. Some churches will find AI tools genuinely useful for taking admin off people's plates. Others will look carefully and decide it's not for them — and that is a faithful decision, not a failure to keep up. A church that never touches AI lacks nothing essential to its calling.</p>
+  <p>What every church <em>does</em> need is a considered position, because AI is already in your building — in someone's sermon prep, a volunteer's newsletter draft, the phone in every pocket. The goal of this guide is simple: help you decide, and decide well.</p>
+  <p>If you read nothing else, adapt the one page below. Everything after it just explains the thinking.</p>
+</section>
+
+<section>
+  <h2>First, what AI actually is</h2>
+  <p>The AI everyone is talking about — ChatGPT and tools like it — is best understood as <strong>a confident new volunteer who has read an enormous amount, but has never met your congregation.</strong></p>
+  <p>It's read millions of books, articles and websites, and it's remarkably good at producing fluent, human-sounding writing on almost anything, instantly, at any hour. That makes it genuinely useful for drafts, summaries and tidy-ups.</p>
+  <p>But like that volunteer, it has real limits. It doesn't know your people or your context. It sometimes gets things confidently wrong — including inventing quotes, statistics and even Bible references that sound plausible but don't exist. And anything you tell a free public AI tool may be kept by the company that runs it.</p>
+  <p>So you treat it the way you'd treat that volunteer: happy to hand over a first draft of the newsletter; never left alone with the pastoral filing cabinet.</p>
+</section>
+
+<hr class="tearline" aria-hidden="true">
+
+<div class="ground-rules">
+  <div class="hebrew-corner" aria-hidden="true">עֵזֶר</div>
+  <h2>AI ground rules for our church</h2>
+  <p class="gr-intro">Adapt this page, agree it as a leadership, put a name on it, and put it somewhere people can find it. It will do more good than any subscription.</p>
+  <p class="gr-agreed">At <span class="blank" contenteditable="true" data-hint="church name"></span>, we've agreed:</p>
+  <ol>
+    <li><strong>People before efficiency.</strong> We use AI to make more time for people — never to replace time <em>with</em> people.</li>
+    <li><strong>No personal details go into public AI tools.</strong> Names, contact details, prayer requests, health situations, pastoral matters — never. If we need AI's help with something involving a person, we remove anything that could identify them first — because behind every entry is someone who trusted us.</li>
+    <li><strong>Pastoral care stays human.</strong> We don't use AI for counselling, pastoral conversations, or responding to someone in crisis. AI can draft the email; it can't visit the hospital.</li>
+    <li><strong>A person checks everything.</strong> AI produces drafts, not finished work. Someone verifies facts, quotes and Scripture references before anything goes out in our name.</li>
+    <li><strong>We're honest about it.</strong> If AI played a significant part in something we share publicly, we don't pretend otherwise.</li>
+    <li><strong>Teaching remains ours.</strong> AI may help with research and tidying words, but the message preached here comes from prayer, Scripture and the person God has called to bring it.</li>
+    <li><strong>Free first, and we can stop anytime.</strong> We prefer free or low-cost tools, we review anything we pay for once a year, and we avoid tools we couldn't walk away from.</li>
+    <li><strong><span class="blank" contenteditable="true" data-hint="name"></span> looks after this policy</strong> (backup: <span class="blank" contenteditable="true" data-hint="name"></span>), answers questions about it, and reviews it every year — next review <span class="blank" contenteditable="true" data-hint="month, year"></span>.</li>
+  </ol>
+</div>
+
+<section>
+  <h2>Where AI genuinely helps</h2>
+  <p>The honest pattern from churches already using these tools: AI is most useful for the work that drains your people without needing their heart. Some real examples, smallest first:</p>
+  <p><strong>Admin.</strong> Paste in a rambling email thread and ask for a summary and action list. Ask it to turn your scribbled notes into tidy meeting minutes. Have it draft a roster reminder, a volunteer role description, or a letter you've been putting off for a fortnight.</p>
+  <p><strong>Communications.</strong> Give it your service details and ask for a first-draft newsletter blurb, then rewrite it in your own voice. Ask it to shorten something to fit a slide, or rewrite a notice in plain English for your website.</p>
+  <p><strong>Summarising and research.</strong> Feed it a forty-page denominational report and ask for one page. Ask it to explain a grant application form, compare two software options, or lay out both sides of a decision your leadership is weighing.</p>
+  <div class="card">
+    <h3>A good first step this week</h3>
+    <p>Pick <strong>one</strong> draining, low-stakes task — the newsletter blurb is a popular choice — and try it with a free tool. Judge the result honestly. That single experiment will teach you more than ten articles like this one.</p>
+  </div>
+  <p>One caution as you start: the point of the time saved is people. If AI frees up three hours a week, the faithful question is where those hours go — not how many more tasks can fill them.</p>
+</section>
+
+<section>
+  <h2>Where to be careful — or simply say no</h2>
+  <p><strong>Anyone's personal information.</strong> This is the bright line. More on the legal side below, but the pastoral logic is enough: people share things with a church they'd share nowhere else. That trust must never end up on a tech company's servers because it was pasted into a free chatbot. De-identify or don't use it — "a member in their seventies recovering from surgery" instead of a name.</p>
+  <p><strong>Pastoral care and crisis.</strong> An AI can produce comforting words. It cannot sit with someone, notice what isn't being said, pray with them, or carry their story with them for years. Ministry runs on presence — the Word became flesh and dwelt among us; he did not send a message. Anything that substitutes for presence costs more than it saves.</p>
+  <p><strong>Theological authority.</strong> AI has no faith, no discernment of spirits, and no accountability to your church. It will also, without blushing, invent a Bible verse or misattribute a quote — Bible college lecturers are already catching AI-fabricated references that sound entirely plausible. Use it to gather and tidy; never to settle what is true, and never unchecked.</p>
+  <p><strong>Anything you can't check.</strong> If nobody in the room can tell whether the AI's output is right — legal questions, safe-ministry obligations, building compliance — that's not a job for AI. "Too hard for a chatbot" is a perfectly good answer; ask a qualified human.</p>
+  <p>And underneath all four: the biggest risk isn't a bad paragraph, it's a breach of trust. One prayer list pasted into the wrong tool can undo years of confidence. Decide your downside first, and the rest of this gets easy.</p>
+</section>
+
+<section>
+  <h2>The Australian legal picture, briefly</h2>
+  <p class="aside">Two things are worth knowing. (This is general information, not legal advice.)</p>
+  <p><strong>Church data is "sensitive information."</strong> Under the Privacy Act, information revealing someone's religious beliefs or affiliation is classed as sensitive — the same category as health information. Which means a church's membership roll and prayer lists are sensitive information <em>by definition</em>, deserving the highest care. The privacy regulator's own guidance says organisations should not put personal information — especially sensitive information — into publicly available AI tools.</p>
+  <p><strong>The "we're too small" era is ending.</strong> Many churches have historically fallen under the Privacy Act's small-organisation exemption (turnover under $3&nbsp;million). That exemption is being wound back as part of privacy reforms now in motion — timing still settling, but the direction is clear. The good news: everything in the ground rules above is free to do, and doing it now means the law will never catch you out.</p>
+</section>
+
+<section>
+  <h2>Shepherding people who already use AI</h2>
+  <p>One more thing your AI policy won't cover: your congregation is ahead of you. Recent American research found roughly one in three adults — two in five among younger generations — say they'd trust spiritual advice from an AI as much as from a pastor, and many Christians already use AI for prayer and Bible study, while very few pastors feel equipped to teach on it. Banning or ignoring it won't reach the person quietly asking a chatbot their hardest questions at midnight. Name it from the front, talk about it in small groups, and make sure your people know the questions AI answers fluently are the ones your church exists to walk through personally.</p>
+</section>
+
+<section>
+  <h2>Getting started: tools, held loosely</h2>
+  <p class="aside">Tool names date quickly — treat these as examples of categories, not endorsements. Lead free, and check each tool's settings for an option to keep your data out of training.</p>
+  <p><strong>General assistants</strong> — the "confident volunteer" itself: ChatGPT, Claude, Microsoft Copilot, Google Gemini. All have capable free tiers; one is plenty.</p>
+  <p><strong>Writing and design helpers</strong> — AI built into tools you may already have: Canva (an Australian company with a generous free plan for nonprofits), and the AI features appearing inside Word and Google Docs.</p>
+  <p><strong>Meeting notes and transcription</strong> — genuinely useful for minutes, but a double caution: always get the room's consent before recording, and never use them for pastoral conversations.</p>
+  <p>One tool well used beats five half-used. Start with a single free general assistant, live with it for a season, and only add anything else when a real need — not a shiny feature — asks for it.</p>
+</section>
+
+<section>
+  <h2>The heart of it</h2>
+  <p>Every hour and dollar in a church is entrusted, not owned. AI is worth considering for exactly one reason: used carefully, it can hand hours back to the work only people can do — the visit, the conversation, the prayer. Used carelessly, it borrows against the very trust ministry runs on.</p>
+  <p>So take the free options, keep the ground rules, stay unhurried. And if you decide AI isn't for your church — you've lost nothing that matters.</p>
+</section>
+
+<footer>
+  <p><span class="fmark">EZER</span> · Helping churches steward what God has given.</p>
+  <p>Questions? <a href="mailto:hello@ezerco.au">hello@ezerco.au</a> · Last reviewed July 2026</p>
+</footer>
+
+</div>
+</body>
+</html>
