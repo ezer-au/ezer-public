@@ -1178,7 +1178,10 @@ function Results({ answers, selectedModules, onEmailSubmit, submitted }) {
 
   const [email, setEmail] = useState("");
   const [church, setChurch] = useState("");
+  const [churchSize, setChurchSize] = useState("");
+  const [churchState, setChurchState] = useState("");
   const [err, setErr] = useState("");
+  const [consent, setConsent] = useState(true);
 
   const submit = () => {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -1186,7 +1189,7 @@ function Results({ answers, selectedModules, onEmailSubmit, submitted }) {
       return;
     }
     setErr("");
-    onEmailSubmit({ email, church, answers, selectedModules });
+    onEmailSubmit({ email, church, churchSize, churchState, answers, selectedModules, consent });
   };
 
   return (
@@ -1252,8 +1255,51 @@ function Results({ answers, selectedModules, onEmailSubmit, submitted }) {
             Pop your email in and we'll send your results plus a free AI-for-churches guide. No pressure, no sales pitch — you can just reply if you'd like to talk.
           </p>
           <input type="text" placeholder="Church name (optional)" value={church} onChange={(e) => setChurch(e.target.value)} style={inputStyle} />
+          <div style={{ display: "flex", gap: "0.7rem" }}>
+            <select
+              value={churchSize}
+              onChange={(e) => setChurchSize(e.target.value)}
+              style={{ ...inputStyle, flex: 1, color: churchSize ? "var(--ink)" : "var(--ink-soft)" }}
+            >
+              <option value="">Church size (optional)</option>
+              <option value="under_50">Under 50</option>
+              <option value="50_100">50–100</option>
+              <option value="100_150">100–150</option>
+              <option value="150_200">150–200</option>
+              <option value="200_300">200–300</option>
+              <option value="300_500">300–500</option>
+              <option value="500_1000">500–1000</option>
+              <option value="1000_plus">1000+</option>
+            </select>
+            <select
+              value={churchState}
+              onChange={(e) => setChurchState(e.target.value)}
+              style={{ ...inputStyle, flex: 1, color: churchState ? "var(--ink)" : "var(--ink-soft)" }}
+            >
+              <option value="">State (optional)</option>
+              <option value="NSW">NSW</option>
+              <option value="VIC">VIC</option>
+              <option value="QLD">QLD</option>
+              <option value="WA">WA</option>
+              <option value="SA">SA</option>
+              <option value="TAS">TAS</option>
+              <option value="ACT">ACT</option>
+              <option value="NT">NT</option>
+            </select>
+          </div>
           <input type="email" placeholder="Your email" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
           {err && <p style={{ color: "var(--clay)", fontSize: "0.88rem", marginBottom: "0.8rem" }}>{err}</p>}
+          <label style={{ display: "flex", alignItems: "flex-start", gap: "0.6rem", marginBottom: "1.2rem", cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              style={{ marginTop: "0.2rem", width: 16, height: 16, flexShrink: 0, accentColor: topAccent }}
+            />
+            <span style={{ fontSize: "0.85rem", color: "var(--ink-soft)", lineHeight: 1.5 }}>
+              Your answers may be included in anonymised, aggregated research about Australian churches — never identifying you or your church. Untick to opt out.
+            </span>
+          </label>
           <button onClick={submit} style={{ ...btnPrimary(topAccent), width: "100%" }}>Send me my summary</button>
           <p style={{ fontSize: "0.85rem", color: "var(--ink-soft)", textAlign: "center", marginTop: "1.2rem" }}>
             Prefer to reach out first? Email us any time at{" "}
@@ -1336,7 +1382,7 @@ function App() {
         email:   p.email,
         source:  "diagnosis-free",
         triage:  p.selectedModules ?? null,
-        answers: { church: p.church ?? null, responses: p.answers ?? null }
+        answers: { church: p.church ?? null, church_size: p.churchSize || null, state: p.churchState || null, responses: p.answers ?? null, research_consent: p.consent ?? true }
       });
       if (error) console.error("EZER lead save failed:", error);
     } catch (e) { console.error("EZER lead save failed:", e); }
