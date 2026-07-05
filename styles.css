@@ -190,5 +190,11 @@ p{ color:var(--ink-soft); max-width:60ch; }
 .footer-inner{ max-width:860px; margin:0 auto; display:flex; justify-content:space-between; flex-wrap:wrap; gap:20px; font-size:.84rem; color:var(--ink-soft); }
 .footer a{ color:var(--terracotta); text-decoration:none; }
 .footer-links{ display:flex; gap:18px; list-style:none; margin:0; padding:0; }
+.footer-ai{
+  max-width:860px; margin:22px auto 0; padding-top:18px;
+  border-top:1px solid var(--line);
+  text-align:center; font-size:.76rem; color:var(--ink-soft); opacity:.72;
+  font-style:italic;
+}
 
 :focus-visible{ outline:2px solid var(--terracotta); outline-offset:3px; }
