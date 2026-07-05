@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- TEMP: noindex while this is V0 (friends-only). REMOVE this meta tag before sending V1 to the wider church network. -->
+<meta name="robots" content="noindex, nofollow" />
+<title>The Church Operations Survey · Ezer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Noto+Serif+Hebrew:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #F5F1E8;
+    --cream-deep: #EDE6D6;
+    --ink: #2B2924;
+    --ink-soft: #5C574C;
+    --clay: #B5643C;
+    --clay-deep: #9A5230;
+    --sage-label: #7C8471;
+    --line: #DDD4C2;
+    --white-warm: #FBF9F3;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .serif { font-family: 'Fraunces', Georgia, serif; }
+  .hebrew { font-family: 'Noto Serif Hebrew', serif; }
+  #root { min-height: 100vh; display: flex; flex-direction: column; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+    outline: 2px solid var(--clay); outline-offset: 2px;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade { animation: fadeUp 0.4s ease both; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 4px;
+    background: var(--cream-deep);
+    border-radius: 2px; outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--thumb-color, var(--clay));
+    cursor: pointer;
+    border: 3px solid var(--white-warm);
+    box-shadow: 0 0 0 1.5px var(--thumb-color, var(--clay));
+    transition: transform 0.15s ease;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  input[type=range]::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--thumb-color, var(--clay)); cursor: pointer;
+    border: 3px solid var(--white-warm);
+    box-shadow: 0 0 0 1.5px var(--thumb-color, var(--clay));
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script type="text/babel">
+const { useState, useMemo, useContext, createContext } = React;
+
+const EZER = { contactEmail: "hello@ezerco.au" };
+
+/* ─── SURVEY VERSION ─── */
+/* Edit this before each send. Optionally override per-link with ?v=v1 in the URL. */
+const SURVEY_VERSION = new URLSearchParams(window.location.search).get("v") || "v0";
+
+/* ─── SUPABASE ─── */
+const SUPABASE_URL      = "https://uqzvjqnjjfwsivzfnexn.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_Dreg7hgeXiHi4ZFr8c-OQQ_aOhNt87y";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ─── ACCENT CONTEXT ─── */
+const AccentContext = createContext("#B5643C");
+function useAccent() { return useContext(AccentContext); }
+
+/* ─── MODULE ACCENT COLOURS (matches the Diagnosis tool) ─── */
+const MODULE_ACCENTS = {
+  comms:      { main: "#B5643C", deep: "#9A5230" },
+  admin:      { main: "#7C8C6E", deep: "#637055" },
+  tech:       { main: "#6B8FA8", deep: "#527490" },
+  compliance: { main: "#A8893A", deep: "#8A6F2C" },
+  pastoral:   { main: "#9A7090", deep: "#7D5874" },
+};
+
+/* ─── SHARED STYLES ─── */
+const inputStyle = {
+  width: "100%", padding: "0.8rem 1rem", marginBottom: "0.8rem",
+  border: "1.5px solid var(--line)", borderRadius: 8, fontSize: "1rem",
+  fontFamily: "inherit", color: "var(--ink)", background: "var(--cream)",
+};
+
+function btnPrimary(accent, disabled) {
+  return {
+    background: disabled ? "#C8B8A6" : accent, color: "var(--white-warm)", border: "none",
+    padding: "0.85rem 2rem", fontSize: "1rem", fontWeight: 600,
+    fontFamily: "inherit", borderRadius: 8, cursor: disabled ? "not-allowed" : "pointer",
+    transition: "background 0.2s ease",
+  };
+}
+const btnGhost = {
+  background: "transparent", color: "var(--ink)",
+  border: "1.5px solid var(--line)",
+  padding: "0.8rem 1.6rem", fontSize: "0.95rem",
+  fontWeight: 600, fontFamily: "inherit",
+  borderRadius: 8, cursor: "pointer",
+};
+
+/* ─── WORDMARK ─── */
+function Wordmark({ size }) {
+  const s = size === "large"
+    ? { word: "clamp(2.6rem, 9vw, 4.2rem)", heb: "clamp(3.4rem, 11vw, 5.8rem)" }
+    : { word: "1.6rem", heb: "2.2rem" };
+  return (
+    <div style={{ position: "relative", display: "inline-block", lineHeight: 1 }}>
+      <span style={{
+        fontFamily: "'Noto Serif Hebrew', serif",
+        position: "absolute", top: "50%", left: "50%",
+        transform: "translate(-50%, -42%)",
+        fontSize: s.heb, color: "var(--clay)", opacity: 0.13,
+        fontWeight: 500, whiteSpace: "nowrap", pointerEvents: "none",
+      }} aria-hidden="true">עֵזֶר</span>
+      <span className="serif" style={{
+        position: "relative", fontSize: s.word,
+        fontWeight: 600, letterSpacing: "0.14em", color: "var(--ink)",
+      }}>EZER</span>
+    </div>
+  );
+}
+
+/* ─── PROGRESS ─── */
+function Progress({ current, total, accent }) {
+  return (
+    <div style={{ maxWidth: 520, margin: "0 auto 1.6rem", padding: "0 1.5rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+        <span style={{ fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-soft)", fontWeight: 600 }}>
+          Step {current} of {total}
+        </span>
+      </div>
+      <div style={{ height: 4, background: "var(--cream-deep)", borderRadius: 2, overflow: "hidden" }}>
+        <div style={{ height: "100%", width: `${(current / total) * 100}%`, background: accent, transition: "width 0.3s ease" }} />
+      </div>
+    </div>
+  );
+}
+
+/* ─── MODULE PULSE CONTENT ─── */
+/* ─── SHARED ANSWER BANDS ─── */
+const HOURS_OPTIONS = [
+  "Less than 1 hour",
+  "1–3 hours",
+  "3–6 hours",
+  "6–10 hours",
+  "10+ hours",
+];
+const MONEY_PERIOD_OPTIONS = ["Week", "Month", "Quarter", "Year"];
+const MONEY_AMOUNT_OPTIONS = [
+  "$0",
+  "Under $10",
+  "$10–25",
+  "$25–50",
+  "$50–100",
+  "$100–250",
+  "$250–500",
+  "$500–1,000",
+  "$1,000+",
+];
+
+/* ─── LIVE FRICTION REFLECTION ─── */
+function frictionLabel(v) {
+  if (v <= 1) return "Barely notice it — this pretty much runs itself.";
+  if (v <= 3) return "Low friction — occasionally annoying, never disruptive.";
+  if (v <= 5) return "Noticeable — a regular, moderate drain on your week.";
+  if (v <= 7) return "Heavy — a real source of stress most weeks.";
+  if (v <= 9) return "Very heavy — one of the harder parts of running the church.";
+  return "Maxed out — genuinely overwhelming right now.";
+}
+
+const MODULES = [
+  {
+    id: "comms",
+    name: "Communications",
+    frictionQ: "How much time and energy does getting the word out cost your church each week?",
+    approachQ: "What's your main way of communicating with your church right now?",
+    hoursQ: "Roughly how many hours a week go into communications?",
+    moneyQ: "Roughly how much does your church spend on comms tools?",
+    approachOptions: [
+      "Email newsletter tool (Mailchimp etc.)",
+      "Manual email",
+      "Facebook / Instagram",
+      "Church app (Planning Center, Elvanto, etc.)",
+      "WhatsApp or group chat",
+      "Printed bulletin",
+      "Word of mouth",
+      "No real system",
+    ],
+  },
+  {
+    id: "admin",
+    name: "Admin & Scheduling",
+    frictionQ: "How much friction do rosters, bookings and paperwork cause?",
+    approachQ: "Who mostly carries admin and scheduling for your church?",
+    hoursQ: "Roughly how many hours a week go into admin and scheduling?",
+    moneyQ: "Roughly how much does your church spend on admin tools?",
+    approachOptions: [
+      "Dedicated church software (Elvanto, Planning Center, etc.)",
+      "A volunteer holds it all together",
+      "We have paid admin support",
+      "Spreadsheets, no dedicated person",
+      "Paper / manual",
+      "No real system",
+    ],
+  },
+  {
+    id: "tech",
+    name: "Tech & Tools",
+    frictionQ: "How much time and stress does managing your church's tech and tools cost you?",
+    approachQ: "How would you describe your church's tech setup?",
+    hoursQ: "Roughly how many hours a week go into managing tech and tools?",
+    moneyQ: "Roughly how much does your church spend on tech and software?",
+    approachOptions: [
+      "Mostly Google Workspace",
+      "Mostly Microsoft 365",
+      "A mix of different tools",
+      "One person knows how it all works",
+      "Very minimal / basic",
+      "No real system",
+    ],
+  },
+  {
+    id: "compliance",
+    name: "Compliance",
+    frictionQ: "How much energy does compliance (Working With Children checks, policies, ACNC reporting) take up?",
+    approachQ: "How's your compliance picture feeling at the moment?",
+    hoursQ: "Roughly how many hours a week go into compliance and paperwork?",
+    moneyQ: "Roughly how much does your church spend on compliance-related costs?",
+    approachOptions: [
+      "Fully on top of it, feels calm",
+      "Mostly across it, a few gaps",
+      "Behind on some things",
+      "Honestly, not sure what's required",
+    ],
+  },
+  {
+    id: "pastoral",
+    name: "Pastoral Care",
+    frictionQ: "How much time and energy does keeping track of pastoral care cost?",
+    approachQ: "How is pastoral care mostly carried in your church?",
+    hoursQ: "Roughly how many hours a week go into pastoral care follow-up?",
+    moneyQ: "Roughly how much does your church spend supporting pastoral care?",
+    approachOptions: [
+      "Mostly the pastor",
+      "Shared across a team",
+      "Ad hoc, whoever notices",
+      "Falls through the cracks sometimes",
+    ],
+  },
+];
+
+/* ─── INTRO ─── */
+function Intro({ onStart }) {
+  const accent = useAccent();
+  return (
+    <div className="fade" style={{ maxWidth: 600, margin: "0 auto", padding: "clamp(2rem, 8vh, 5rem) 1.5rem", textAlign: "center" }}>
+      <div style={{ marginBottom: "2rem" }}>
+        <Wordmark size="large" />
+      </div>
+      <p style={{ fontSize: "0.82rem", letterSpacing: "0.14em", textTransform: "uppercase", color: accent, fontWeight: 600, marginBottom: "1rem" }}>
+        The Church Operations Survey
+      </p>
+      <h1 className="serif" style={{ fontSize: "clamp(1.6rem, 5vw, 2.2rem)", fontWeight: 500, lineHeight: 1.35, marginBottom: "1.2rem" }}>
+        Nobody's ever really asked how Australian churches run day to day. We'd love to ask you.
+      </h1>
+      <p style={{ fontSize: "1.02rem", color: "var(--ink-soft)", marginBottom: "1.6rem", lineHeight: 1.65 }}>
+        Five friendly questions on communications, admin, tech, compliance and pastoral care — no personal details needed unless you'd like to share them. About 3 minutes, and every answer genuinely helps.
+      </p>
+      <p style={{ fontSize: "0.92rem", color: "var(--ink-soft)", marginBottom: "2.4rem", lineHeight: 1.6 }}>
+        Your answers join others, anonymously, to build the first honest picture of how Australian church offices actually run — and we'll share what we learn, free, with every church.
+      </p>
+      <button onClick={onStart} style={btnPrimary(accent)}>I'd love to help</button>
+    </div>
+  );
+}
+
+/* ─── CLASSIFY ─── */
+function Classify({ initial, onNext }) {
+  const accent = useAccent();
+  const [size, setSize] = useState(initial.size || "");
+  const [state, setState] = useState(initial.state || "");
+  const [denomination, setDenomination] = useState(initial.denomination || "");
+
+  return (
+    <div className="fade" style={{ maxWidth: 520, margin: "0 auto", padding: "0 1.5rem", width: "100%" }}>
+      <h2 className="serif" style={{ fontSize: "1.5rem", fontWeight: 500, marginBottom: "0.6rem" }}>
+        Tell us a little about your church
+      </h2>
+      <p style={{ fontSize: "0.95rem", color: "var(--ink-soft)", marginBottom: "1.6rem" }}>
+        Totally optional — but it's what lets us compare small churches to large, and state to state, so please share if you're comfortable.
+      </p>
+
+      <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--ink-soft)", display: "block", marginBottom: "0.4rem" }}>Church size (average weekly attendance)</label>
+      <select value={size} onChange={(e) => setSize(e.target.value)} style={{ ...inputStyle, color: size ? "var(--ink)" : "var(--ink-soft)" }}>
+        <option value="">Prefer not to say</option>
+        <option value="under_50">Under 50</option>
+        <option value="50_100">50–100</option>
+        <option value="100_150">100–150</option>
+        <option value="150_200">150–200</option>
+        <option value="200_300">200–300</option>
+        <option value="300_500">300–500</option>
+        <option value="500_1000">500–1000</option>
+        <option value="1000_plus">1000+</option>
+      </select>
+
+      <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--ink-soft)", display: "block", marginBottom: "0.4rem" }}>State</label>
+      <select value={state} onChange={(e) => setState(e.target.value)} style={{ ...inputStyle, color: state ? "var(--ink)" : "var(--ink-soft)" }}>
+        <option value="">Prefer not to say</option>
+        <option value="NSW">NSW</option>
+        <option value="VIC">VIC</option>
+        <option value="QLD">QLD</option>
+        <option value="WA">WA</option>
+        <option value="SA">SA</option>
+        <option value="TAS">TAS</option>
+        <option value="ACT">ACT</option>
+        <option value="NT">NT</option>
+      </select>
+
+      <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--ink-soft)", display: "block", marginBottom: "0.4rem" }}>Denomination (optional)</label>
+      <input type="text" placeholder="e.g. Baptist, Anglican, Pentecostal, non-denom" value={denomination} onChange={(e) => setDenomination(e.target.value)} style={inputStyle} />
+
+      <button onClick={() => onNext({ size, state, denomination })} style={{ ...btnPrimary(accent), width: "100%", marginTop: "0.6rem" }}>
+        Continue
+      </button>
+    </div>
+  );
+}
+
+/* ─── MODULE PULSE SCREEN ─── */
+function PulseModule({ module, initial, onNext }) {
+  const accent = MODULE_ACCENTS[module.id].main;
+  const [friction, setFriction] = useState(initial.friction ?? 5);
+  const [approach, setApproach] = useState(initial.approach ?? "");
+  const [hours, setHours] = useState(initial.hours ?? "");
+  const [moneyPeriod, setMoneyPeriod] = useState(initial.moneyPeriod ?? "");
+  const [moneyAmount, setMoneyAmount] = useState(initial.moneyAmount ?? "");
+
+  const canContinue = approach && hours && moneyPeriod && moneyAmount;
+
+  return (
+    <div className="fade" style={{ maxWidth: 520, margin: "0 auto", padding: "0 1.5rem", width: "100%" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "1.4rem" }}>
+        <span style={{ width: 8, height: 8, borderRadius: "50%", background: accent, flexShrink: 0 }} />
+        <span style={{ fontSize: "0.78rem", letterSpacing: "0.12em", textTransform: "uppercase", color: accent, fontWeight: 600 }}>
+          {module.name}
+        </span>
+      </div>
+
+      <h2 className="serif" style={{ fontSize: "1.35rem", fontWeight: 500, lineHeight: 1.4, marginBottom: "1.4rem" }}>
+        {module.frictionQ}
+      </h2>
+      <div style={{ marginBottom: "2.4rem" }}>
+        <input
+          type="range" min="0" max="10" value={friction}
+          onChange={(e) => setFriction(Number(e.target.value))}
+          style={{ "--thumb-color": accent }}
+        />
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.5rem" }}>
+          <span style={{ fontSize: "0.8rem", color: "var(--ink-soft)" }}>Barely notice it</span>
+          <span style={{ fontSize: "0.8rem", color: "var(--ink-soft)" }}>One of our biggest drains</span>
+        </div>
+        <div style={{
+          marginTop: "0.9rem", padding: "0.7rem 0.9rem",
+          background: "var(--cream-deep)", borderRadius: 8,
+          borderLeft: `3px solid ${accent}`,
+        }}>
+          <p style={{ fontSize: "0.9rem", color: "var(--ink)", fontWeight: 500 }}>
+            {frictionLabel(friction)}
+          </p>
+        </div>
+      </div>
+
+      <h3 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: "0.9rem" }}>{module.approachQ}</h3>
+      <div style={{ marginBottom: "1.8rem" }}>
+        {module.approachOptions.map((opt) => {
+          const active = approach === opt;
+          return (
+            <button
+              key={opt}
+              onClick={() => setApproach(opt)}
+              style={{
+                display: "block", width: "100%", textAlign: "left",
+                padding: "0.75rem 1rem", marginBottom: "0.55rem",
+                border: `1.5px solid ${active ? accent : "var(--line)"}`,
+                background: active ? accent : "var(--white-warm)",
+                color: active ? "var(--white-warm)" : "var(--ink)",
+                borderRadius: 8, fontFamily: "inherit", fontSize: "0.95rem",
+                cursor: "pointer", transition: "all 0.15s ease",
+              }}
+            >
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+
+      <label style={{ fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.4rem" }}>{module.hoursQ}</label>
+      <select value={hours} onChange={(e) => setHours(e.target.value)} style={{ ...inputStyle, color: hours ? "var(--ink)" : "var(--ink-soft)" }}>
+        <option value="">Choose an estimate — no need to be exact</option>
+        {HOURS_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+      </select>
+
+      <label style={{ fontSize: "0.9rem", fontWeight: 600, display: "block", marginBottom: "0.4rem" }}>{module.moneyQ}</label>
+      <div style={{ display: "flex", gap: "0.7rem" }}>
+        <select value={moneyAmount} onChange={(e) => setMoneyAmount(e.target.value)} style={{ ...inputStyle, flex: 1.2, color: moneyAmount ? "var(--ink)" : "var(--ink-soft)" }}>
+          <option value="">Amount</option>
+          {MONEY_AMOUNT_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+        </select>
+        <select value={moneyPeriod} onChange={(e) => setMoneyPeriod(e.target.value)} style={{ ...inputStyle, flex: 1, color: moneyPeriod ? "var(--ink)" : "var(--ink-soft)" }}>
+          <option value="">Per...</option>
+          {MONEY_PERIOD_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+        </select>
+      </div>
+
+      <button
+        onClick={() => onNext({ friction, approach, hours, moneyPeriod, moneyAmount })}
+        disabled={!canContinue}
+        style={{ ...btnPrimary(accent, !canContinue), width: "100%", marginTop: "0.6rem" }}
+      >
+        Continue
+      </button>
+    </div>
+  );
+}
+
+/* ─── FEEDBACK ─── */
+function Feedback({ initial, onNext }) {
+  const accent = useAccent();
+  const [text, setText] = useState(initial || "");
+
+  return (
+    <div className="fade" style={{ maxWidth: 520, margin: "0 auto", padding: "0 1.5rem", width: "100%" }}>
+      <h2 className="serif" style={{ fontSize: "1.5rem", fontWeight: 500, marginBottom: "0.6rem" }}>
+        One last thing, and it's the one we're most curious about.
+      </h2>
+      <p style={{ fontSize: "0.95rem", color: "var(--ink-soft)", marginBottom: "1.4rem", lineHeight: 1.6 }}>
+        Is there something about how Australian churches operate that you've always wished someone was actually measuring? Anything at all — we read every single response, and it genuinely shapes what we ask next time.
+      </p>
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Totally optional — but we'd love to hear it"
+        style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6, marginBottom: "1.6rem", minHeight: 110 }}
+      />
+      <button onClick={() => onNext(text)} style={{ ...btnPrimary(accent), width: "100%" }}>
+        Continue
+      </button>
+    </div>
+  );
+}
+
+/* ─── CAPTURE (email optional, consent) ─── */
+function Capture({ onSubmit, submitted }) {
+  const accent = useAccent();
+  const [email, setEmail] = useState("");
+  const [church, setChurch] = useState("");
+  const [consent, setConsent] = useState(true);
+  const [err, setErr] = useState("");
+
+  const submit = () => {
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErr("That doesn't look like a valid email — leave it blank if you'd rather not share it.");
+      return;
+    }
+    setErr("");
+    onSubmit({ email, church, consent });
+  };
+
+  if (submitted) {
+    return (
+      <div className="fade" style={{ maxWidth: 520, margin: "0 auto", padding: "clamp(2rem, 8vh, 5rem) 1.5rem", textAlign: "center" }}>
+        <p className="serif" style={{ fontSize: "1.5rem", fontWeight: 500, marginBottom: "0.8rem" }}>Thank you, truly.</p>
+        <p style={{ fontSize: "1rem", color: "var(--ink-soft)", marginBottom: "1.6rem" }}>
+          That was genuinely generous of you. Your answers are now part of the first honest picture of how Australian church offices run — we'll publish what we learn, free, for every church to use.
+        </p>
+        <div className="hebrew" style={{ fontSize: "2rem", color: accent, opacity: 0.5 }}>עֵזֶר</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fade" style={{ maxWidth: 520, margin: "0 auto", padding: "0 1.5rem", width: "100%" }}>
+      <h2 className="serif" style={{ fontSize: "1.5rem", fontWeight: 500, marginBottom: "0.6rem" }}>
+        Almost there — thank you for sticking with it.
+      </h2>
+      <p style={{ fontSize: "0.95rem", color: "var(--ink-soft)", marginBottom: "1.6rem" }}>
+        Want to hear when the report is published? We'd love to let you know — completely optional.
+      </p>
+      <input type="text" placeholder="Church name (optional)" value={church} onChange={(e) => setChurch(e.target.value)} style={inputStyle} />
+      <input type="email" placeholder="Your email (optional)" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
+      {err && <p style={{ color: "var(--clay)", fontSize: "0.88rem", marginBottom: "0.8rem" }}>{err}</p>}
+
+      <label style={{ display: "flex", alignItems: "flex-start", gap: "0.6rem", marginBottom: "1.4rem", cursor: "pointer" }}>
+        <input
+          type="checkbox"
+          checked={consent}
+          onChange={(e) => setConsent(e.target.checked)}
+          style={{ marginTop: "0.2rem", width: 16, height: 16, flexShrink: 0, accentColor: accent }}
+        />
+        <span style={{ fontSize: "0.85rem", color: "var(--ink-soft)", lineHeight: 1.5 }}>
+          Your answers may be included in anonymised, aggregated research about Australian churches — never identifying you or your church. Untick to opt out.
+        </span>
+      </label>
+
+      <button onClick={submit} style={{ ...btnPrimary(accent), width: "100%" }}>Submit</button>
+      <p style={{ fontSize: "0.85rem", color: "var(--ink-soft)", textAlign: "center", marginTop: "1.2rem" }}>
+        Questions? Email us at{" "}
+        <a href={"mailto:" + EZER.contactEmail} style={{ color: accent, fontWeight: 600 }}>{EZER.contactEmail}</a>
+      </p>
+    </div>
+  );
+}
+
+/* ─── MAIN APP ─── */
+function App() {
+  const [stage, setStage] = useState("intro"); // intro | classify | module | feedback | capture
+  const [moduleIdx, setModuleIdx] = useState(0);
+  const [classification, setClassification] = useState({});
+  const [moduleAnswers, setModuleAnswers] = useState({});
+  const [feedback, setFeedback] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  const totalSteps = 2 + MODULES.length; // classify + modules + feedback
+
+  const currentAccent = useMemo(() => {
+    if (stage === "module") return MODULE_ACCENTS[MODULES[moduleIdx].id].main;
+    return "#B5643C";
+  }, [stage, moduleIdx]);
+
+  const handleClassifyNext = (data) => {
+    setClassification(data);
+    setModuleIdx(0);
+    setStage("module");
+  };
+
+  const handleModuleNext = (data) => {
+    const mod = MODULES[moduleIdx];
+    setModuleAnswers((prev) => ({ ...prev, [mod.id]: data }));
+    if (moduleIdx + 1 < MODULES.length) {
+      setModuleIdx(moduleIdx + 1);
+    } else {
+      setStage("feedback");
+    }
+  };
+
+  const handleFeedbackNext = (text) => {
+    setFeedback(text);
+    setStage("capture");
+  };
+
+  const handleSubmit = async ({ email, church, consent }) => {
+    try {
+      const { error } = await sb.from("leads").insert({
+        email: email || null,
+        source: "operations-survey",
+        triage: null,
+        answers: {
+          survey_version: SURVEY_VERSION,
+          church: church || null,
+          church_size: classification.size || null,
+          state: classification.state || null,
+          denomination: classification.denomination || null,
+          module_responses: moduleAnswers,
+          other_data_wanted: feedback || null,
+          research_consent: consent ?? true,
+        },
+      });
+      if (error) console.error("EZER survey save failed:", error);
+    } catch (e) { console.error("EZER survey save failed:", e); }
+    setSubmitted(true);
+  };
+
+  const currentStepNumber = stage === "classify" ? 1 : stage === "module" ? moduleIdx + 2 : totalSteps;
+
+  return (
+    <AccentContext.Provider value={currentAccent}>
+      {stage !== "intro" && (
+        <div style={{ padding: "1.4rem 1.5rem 0", display: "flex", justifyContent: "center" }}>
+          <Wordmark size="small" />
+        </div>
+      )}
+      <main style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", paddingBottom: "2rem" }}>
+        {stage === "intro" && <Intro onStart={() => setStage("classify")} />}
+
+        {stage === "classify" && (
+          <React.Fragment>
+            <div style={{ paddingTop: "1.5rem" }}>
+              <Progress current={1} total={totalSteps} accent={currentAccent} />
+            </div>
+            <Classify initial={classification} onNext={handleClassifyNext} />
+          </React.Fragment>
+        )}
+
+        {stage === "module" && (
+          <React.Fragment>
+            <div style={{ paddingTop: "1.5rem" }}>
+              <Progress current={moduleIdx + 2} total={totalSteps} accent={currentAccent} />
+            </div>
+            <PulseModule
+              module={MODULES[moduleIdx]}
+              initial={moduleAnswers[MODULES[moduleIdx].id] || {}}
+              onNext={handleModuleNext}
+            />
+          </React.Fragment>
+        )}
+
+        {stage === "feedback" && (
+          <React.Fragment>
+            <div style={{ paddingTop: "1.5rem" }}>
+              <Progress current={MODULES.length + 2} total={totalSteps} accent={currentAccent} />
+            </div>
+            <Feedback initial={feedback} onNext={handleFeedbackNext} />
+          </React.Fragment>
+        )}
+
+        {stage === "capture" && (
+          <Capture onSubmit={handleSubmit} submitted={submitted} />
+        )}
+      </main>
+      <footer style={{ textAlign: "center", padding: "1.5rem", fontSize: "0.8rem", color: "var(--ink-soft)", borderTop: "1px solid var(--line)" }}>
+        Ezer · Helping churches steward what God has given. Everything here is built with AI, directed and owned by Ryan.
+      </footer>
+    </AccentContext.Provider>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
