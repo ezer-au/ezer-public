@@ -381,12 +381,12 @@ const MODULES = [
   },
   {
     id: "pastoral",
-    name: "Pastoral Care",
-    triageLabel: "Pastoral Care",
+    name: "Care & Follow-up",
+    triageLabel: "Care & Follow-up",
     triageDesc: "follow-up, member support, knowing who needs care",
     insight: {
       accentDeep: "#7D5874",
-      eyebrow: "Pastoral Care · Context",
+      eyebrow: "Care & Follow-up · Context",
       statDisplay: "40",
       animateFrom: 0, animateTo: 40,
       statSuffix: "%",
@@ -423,21 +423,20 @@ const MODULES = [
       },
       {
         id: "pastoral_friction",
-        text: "How often do people fall through the cracks — missing a follow-up, not hearing from anyone for too long?",
+        text: "When someone goes quiet or drops off, how reliably does your current setup flag it?",
         type: "slider",
-        low: "Almost never",
-        high: "More often than I'm comfortable with",
+        low: "Always catches it",
+        high: "Mostly relies on someone remembering",
       },
       {
         id: "pastoral_feel",
-        text: "How do you feel about the pastoral care your church is able to provide right now?",
+        text: "If pastoral follow-up could run more on the team and less on you, how much of a relief would that be?",
         type: "single",
         options: [
-          { label: "We're doing well — people feel cared for", value: 1 },
-          { label: "We try hard but we're stretched", value: 2 },
-          { label: "There are people I know we're missing", value: 3 },
-          { label: "It weighs on me more than most things", value: 4 },
-          { label: "I've had to make peace with doing less than I want to", value: 5 },
+          { label: "We're already well-shared as a team", value: 1 },
+          { label: "Mostly me, but it works for now", value: 2 },
+          { label: "It'd be a real relief to share this", value: 3 },
+          { label: "This is one of the heaviest things I carry", value: 4 },
         ],
       },
       {
@@ -758,7 +757,7 @@ function SliderQ({ q, initial, onNext }) {
     },
     pastoral_friction: {
       low:  "It sounds like your follow-up is mostly landing — that's a real gift.",
-      mid:  "It sounds like there are gaps you're aware of but can't always close.",
+      mid:  "Most churches lean on memory here — a light system usually closes that gap.",
       high: "It sounds like this is one of the things that weighs on you most.",
     },
   };
@@ -1009,6 +1008,13 @@ function ModuleInsight({ insight, onContinue }) {
 
 /* ─── RESULTS LOGIC ─── */
 
+// Normalise any answer onto the same 1–10 range as the friction slider,
+// so questions with different option counts (4 vs 5 vs 10) stay comparable.
+function normalizedVal(q, val) {
+  const max = q.type === "slider" ? 10 : Math.max(...q.options.map((o) => o.value));
+  return max > 1 ? 1 + (val - 1) * (9 / (max - 1)) : val;
+}
+
 // Score each module: higher = more friction/need
 function scoreModules(answers, selectedModules) {
   const scores = {};
@@ -1018,7 +1024,7 @@ function scoreModules(answers, selectedModules) {
     let sum = 0, count = 0;
     qs.forEach((q) => {
       const val = answers[q.id];
-      if (val != null && typeof val === "number") { sum += val; count++; }
+      if (val != null && typeof val === "number") { sum += normalizedVal(q, val); count++; }
     });
     if (count > 0) scores[m.id] = { id: m.id, name: m.name, avg: sum / count, isDeep };
   });
