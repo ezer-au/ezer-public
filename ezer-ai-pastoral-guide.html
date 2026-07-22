@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What AI Is Doing to Your People — EZER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Noto+Serif+Hebrew:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F5F1E8;
+    --white-warm:#FBF9F3;
+    --ink:#2B2924;
+    --ink-soft:#5C574C;
+    --clay:#B5643C;
+    --line:#DDD4C2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} }
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:1.0625rem;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:640px;margin:0 auto;padding:0 1.5rem 4rem;}
+
+  /* ---------- header ---------- */
+  header{position:relative;text-align:center;padding:4.5rem 0 3rem;overflow:hidden;}
+  .hebrew-ghost{
+    position:absolute;top:0.25rem;left:50%;transform:translateX(-50%);
+    font-family:'Noto Serif Hebrew',serif;
+    font-size:9rem;line-height:1;
+    color:var(--clay);opacity:0.13;
+    user-select:none;pointer-events:none;
+  }
+  .wordmark{
+    position:relative;
+    font-family:'Fraunces',serif;
+    font-weight:500;font-size:1.5rem;
+    letter-spacing:0.14em;
+    padding-top:2.75rem;
+  }
+  h1{
+    position:relative;
+    font-family:'Fraunces',serif;
+    font-weight:600;font-size:2.35rem;line-height:1.2;
+    margin-top:2.25rem;
+    color:var(--ink);
+  }
+  .subtitle{
+    position:relative;
+    font-family:'Fraunces',serif;font-weight:400;font-style:italic;
+    font-size:1.2rem;color:var(--ink-soft);
+    margin-top:0.85rem;
+  }
+
+  /* ---------- prose ---------- */
+  section{margin-top:3.25rem;}
+  h2{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:1.55rem;line-height:1.3;
+    color:var(--clay);
+    margin-bottom:1.1rem;
+  }
+  p{margin-bottom:1.1rem;}
+  p:last-child{margin-bottom:0;}
+  strong{font-weight:600;color:var(--ink);}
+  em{font-style:italic;}
+  a{color:var(--clay);text-decoration:underline;text-underline-offset:3px;}
+  .lede{font-size:1.15rem;}
+  .aside{color:var(--ink-soft);font-size:0.95rem;}
+
+  .card{
+    background:var(--white-warm);
+    border:1px solid var(--line);
+    border-top:4px solid var(--clay);
+    border-radius:6px;
+    padding:1.6rem 1.75rem;
+    margin:1.4rem 0;
+  }
+  .card h3{
+    font-family:'Fraunces',serif;font-weight:600;font-size:1.1rem;
+    margin-bottom:0.5rem;
+  }
+
+  /* ---------- the short version ---------- */
+  .tldr{
+    background:var(--white-warm);
+    border:1px solid var(--line);
+    border-left:4px solid var(--clay);
+    border-radius:6px;
+    padding:1.5rem 1.75rem;
+    margin-top:2.5rem;
+  }
+  .tldr .tldr-label{
+    font-family:'Inter',sans-serif;font-weight:600;
+    font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--clay);
+    margin-bottom:0.7rem;
+  }
+  .tldr p{font-size:1rem;margin-bottom:0.7rem;}
+  .tldr p:last-child{margin-bottom:0;}
+
+  /* ---------- tear-out page ---------- */
+  .tearline{
+    border:none;
+    border-top:2px dashed var(--line);
+    margin:3.25rem 0 0;
+    position:relative;
+  }
+  .tearline::after{
+    content:"✂ adapt this page and make it yours";
+    position:absolute;top:-0.85em;left:50%;transform:translateX(-50%);
+    background:var(--cream);
+    padding:0 0.75em;
+    font-size:0.8rem;letter-spacing:0.06em;text-transform:uppercase;
+    color:var(--ink-soft);white-space:nowrap;
+  }
+  .ground-rules{
+    background:var(--white-warm);
+    border:1px solid var(--line);
+    border-top:6px solid var(--clay);
+    border-radius:8px;
+    padding:2.4rem 2.3rem 2.1rem;
+    margin-top:2.4rem;
+    position:relative;overflow:hidden;
+  }
+  .ground-rules .hebrew-corner{
+    position:absolute;right:-0.5rem;bottom:-2.2rem;
+    font-family:'Noto Serif Hebrew',serif;
+    font-size:7rem;line-height:1;color:var(--clay);opacity:0.07;
+    user-select:none;pointer-events:none;
+  }
+  .ground-rules h2{
+    color:var(--ink);
+    font-size:1.7rem;
+    margin-bottom:0.4rem;
+  }
+  .ground-rules .gr-intro{
+    font-size:0.95rem;color:var(--ink-soft);font-style:italic;
+    margin-bottom:1.6rem;
+  }
+  .ground-rules ol{
+    list-style:none;counter-reset:rule;
+  }
+  .ground-rules li{
+    counter-increment:rule;
+    position:relative;
+    padding-left:2.4rem;
+    margin-bottom:1.15rem;
+  }
+  .ground-rules li::before{
+    content:counter(rule);
+    position:absolute;left:0;top:0.1em;
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:1.05rem;color:var(--clay);
+    width:1.7rem;text-align:right;
+  }
+  .ground-rules li strong{display:inline;}
+  .blank{
+    display:inline-block;min-width:9ch;
+    border-bottom:1.5px solid var(--clay);
+    padding:0 0.2em;
+    color:var(--clay);font-weight:500;
+    outline:none;
+  }
+  .blank:empty::before{content:attr(data-hint);color:var(--ink-soft);opacity:0.65;font-weight:400;}
+  .gr-agreed{
+    font-family:'Fraunces',serif;font-size:1.05rem;font-weight:500;
+    margin-bottom:1.4rem;
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    margin-top:4.5rem;
+    padding-top:1.75rem;
+    border-top:1px solid var(--line);
+    text-align:center;
+    font-size:0.9rem;color:var(--ink-soft);
+  }
+  footer .fmark{font-family:'Fraunces',serif;letter-spacing:0.14em;color:var(--ink);}
+
+  /* ---------- print ---------- */
+  @media print{
+    body{background:#fff;font-size:10.5pt;line-height:1.55;}
+    .page{max-width:100%;padding:0;}
+    header{padding:1.5rem 0 1rem;}
+    .hebrew-ghost{font-size:6rem;}
+    h1{font-size:20pt;margin-top:1.2rem;}
+    section{margin-top:1.6rem;}
+    h2{font-size:14pt;}
+    .card,.ground-rules{border-radius:0;box-shadow:none;}
+    .tldr{border-radius:0;break-inside:avoid;}
+    .tearline{margin-top:1.5rem;}
+    .ground-rules{
+      break-before:page;
+      break-after:page;
+      page-break-before:always;
+      page-break-after:always;
+      padding:1.8rem 1.9rem;
+      margin-top:0;
+    }
+    .ground-rules li{margin-bottom:0.7rem;}
+    a{color:var(--ink);text-decoration:none;}
+    footer{margin-top:2rem;}
+  }
+  @page{margin:18mm;}
+
+  @media (max-width:480px){
+    h1{font-size:1.85rem;}
+    .hebrew-ghost{font-size:6.5rem;}
+    .ground-rules{padding:1.8rem 1.4rem 1.6rem;}
+    .ground-rules li{padding-left:2rem;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="hebrew-ghost" aria-hidden="true">עֵזֶר</div>
+  <div class="wordmark">EZER</div>
+  <h1>What AI Is Doing to Your People</h1>
+  <p class="subtitle">A pastoral guide for churches</p>
+</header>
+
+<div class="tldr">
+  <p class="tldr-label">The short version</p>
+  <p>Australians are among the most AI-anxious people in the world, and the worried ones are already in your pews. But the fear is rarely about technology — underneath it sit three old questions the church knows well: <strong>who am I if my work disappears, am I being left behind, and what's even real anymore?</strong></p>
+  <p>So respond to the question underneath, not the headline on top. Prepare four things that cost nothing — a pathway for job loss, community that can't be downloaded, an honest position on your own AI use, and eyes on the people quietly leaning on AI for company — then leave the outcome with God. The disruption is making people spiritually hungry; an unanxious, genuinely human church may be the most compelling witness there is.</p>
+</div>
+
+<section>
+  <p class="lede"><strong>If someone in your congregation is scared of AI, they are not overreacting.</strong></p>
+  <p>They're in the majority. Surveys keep finding Australians among the most AI-anxious people in the world — in one thirty-one-country study we topped the list, and in another we ranked last in believing the benefits will outweigh the risks. Three in five Australian workers say AI has already made their job more stressful, and around half worry it could eventually take their job altogether. The people carrying that weight sit in your pews.</p>
+  <p>Most of what's written about AI is aimed at leaders deciding whether to <em>use</em> it. This guide is about something different: how to shepherd people who are worried about what it will <em>do</em> — to their work, their kids, their sense of what's real. Fear of the future is an old human problem, and the church has an old answer for it. AI is new; anxiety about tomorrow isn't.</p>
+  <p>If you read nothing else, adapt the one page below. Everything after it just explains the thinking.</p>
+</section>
+
+<section>
+  <h2>What the fear actually is</h2>
+  <p>Listen carefully to someone worried about AI and you'll rarely hear a question about technology. You'll hear three older questions wearing new clothes:</p>
+  <p><strong>Identity.</strong> <em>Who am I if my work disappears?</em> For decades we've let careers carry our sense of purpose and contribution. When a machine can do the thing you're good at, the question underneath isn't economic — it's "where does my value come from?" The church has been answering that one for two thousand years.</p>
+  <p><strong>Worth.</strong> <em>Am I being left behind?</em> Much of the stress isn't fear of robots — it's the exhaustion of being expected to become an AI expert overnight. Seven in ten Australian workers say their employer isn't preparing them for what's coming. People don't just feel threatened; they feel abandoned to figure it out alone.</p>
+  <p><strong>Trust.</strong> <em>What's real anymore?</em> Fake images, cloned voices, confident nonsense. When people can't trust what they see, a quiet background anxiety settles in. A community where people are known face to face becomes rarer — and more valuable — every year this deepens.</p>
+  <p>The pastoral takeaway is simple: <strong>respond to the question underneath, not the headline on top.</strong> "Will AI take my job?" is usually "am I going to be okay?" — and that's a conversation the church knows how to have.</p>
+</section>
+
+<hr class="tearline" aria-hidden="true">
+
+<div class="ground-rules">
+  <div class="hebrew-corner" aria-hidden="true">עֵזֶר</div>
+  <h2>When someone brings their AI fear to you</h2>
+  <p class="gr-intro">A training page for your leaders, pastoral care team and small group hosts — something to walk through together beforehand, not to pull out mid-conversation. It shapes the instinct; it isn't a script.</p>
+  <p class="gr-agreed">At <span class="blank" contenteditable="true" data-hint="church name"></span>, when someone tells us they're worried about AI, we:</p>
+  <ol>
+    <li><strong>Take it seriously.</strong> We never open with "it's just hype" or "it'll be fine." Most Australians share this worry; dismissing it teaches people to stop bringing it to us.</li>
+    <li><strong>Ask what it touches.</strong> "What worries you most about it?" Their job? Their kids? Not knowing what's true? The answer tells us which conversation we're actually in.</li>
+    <li><strong>Name the question underneath.</strong> Usually identity, worth, or trust. We say it out loud, gently: "It sounds like the real weight is what happens to <em>you</em> if the work changes."</li>
+    <li><strong>Anchor worth where it belongs.</strong> Their value was never in their output — that's not a nice sentiment, it's our actual doctrine. Made in God's image, loved before they produced anything. We say it plainly and often.</li>
+    <li><strong>Don't catastrophise or predict.</strong> We're not futurists. We don't promise jobs are safe, and we don't preach doom. We offer what's certain — Christ, this community, our presence — not forecasts.</li>
+    <li><strong>Offer something concrete.</strong> A follow-up coffee, a person in the congregation who's navigated a career change, prayer now rather than "we'll pray for you."</li>
+    <li><strong>Watch for the heavier load.</strong> If the anxiety is affecting sleep, work or family life, we gently encourage professional support alongside pastoral care — a GP or counsellor. Care has layers, and we're one of them.</li>
+    <li><strong><span class="blank" contenteditable="true" data-hint="name"></span> carries this conversation for our church</strong> (backup: <span class="blank" contenteditable="true" data-hint="name"></span>) — the person our team can hand someone to when the conversation needs more time than a Sunday morning offers.</li>
+  </ol>
+</div>
+
+<section>
+  <h2>What to have ready before the wave</h2>
+  <p>Some of this disruption hasn't fully arrived yet. That's the opportunity — the church that prepares now will be the one people turn to when it does. Four things worth having in place, none of which cost money:</p>
+  <p><strong>A path for job disruption.</strong> Treat AI-driven job loss the way you'd treat any job loss — as a pastoral event, not a news story. Know before it happens: who in your congregation could mentor someone through a career change, what practical help you can offer (meals, childcare during interviews, a working bee on a resume), and how someone signals they need it without shame. A church with a quiet, dignified pathway for the newly unemployed will matter enormously in the next decade.</p>
+  <p><strong>Community that can't be downloaded.</strong> AI can produce a sermon, a worship playlist and a devotional. It cannot share a meal, notice you were missing, or sit with you in hospital. The strategic response to AI isn't better technology — it's doubling down on the things machines can't fake: presence, shared tables, being known by name. Every hour you invest in genuine face-to-face community is an hour invested in the one thing that becomes <em>more</em> valuable as AI advances.</p>
+  <p><strong>An honest position on your own AI use.</strong> Fear grows in vacuums. If your church uses AI for admin or communications, say so plainly; if you never use it for teaching or pastoral care, say that too. A one-page position, publicly available, does more to settle anxiety than any tech talk. (Our companion guide, <em>Using AI Well in Your Church</em>, includes an adaptable one-pager for exactly this.)</p>
+  <p><strong>Eyes on the quiet AI relationships.</strong> This one deserves its own section.</p>
+</section>
+
+<section>
+  <h2>The counsellor in their pocket</h2>
+  <p>While adults debate AI, many of your people — especially the young — have already made it a confidant. Recent Australian polling found roughly three in ten young people use AI to look after their mental health, and a similar number use it for conversation and personal advice. Overseas research finds many Christians now take spiritual questions to a chatbot, with some trusting its guidance as much as a pastor's.</p>
+  <p>Hold two truths together here. For someone with nowhere else to turn at 2am, a chatbot that listens without judgement can feel like a lifeline — and occasionally it genuinely helps. But the research is sobering: leaning on AI for companionship is linked with <em>deepening</em> loneliness over time. A chatbot affirms endlessly, remembers everything, and risks nothing. It offers the sensation of being known without the reality of it — and people can slowly lose their appetite for the harder, richer work of human relationship.</p>
+  <div class="card">
+    <h3>What this asks of your leaders</h3>
+    <p>Don't ban it and don't mock it — either one just drives it underground. Name it from the front, kindly: "some of us are taking our hardest questions to a chatbot at midnight — you can bring those questions here too." Then make sure that's true. For youth leaders especially: a teenager describing an AI as their best friend isn't a punchline, it's a signal that a young person is lonely — and an invitation to draw them toward real ones.</p>
+  </div>
+  <p>The church doesn't need to out-argue the chatbot, and it can't out-perform it on availability. What it has is the one thing the chatbot cannot offer at all: love that is real, because a real person is giving it. That isn't a strategy to win people back — it's simply what the church already is when it shows up. The chatbot cannot love. The church, at its best, can do little else.</p>
+</section>
+
+<section>
+  <h2>End on hope, because the data does</h2>
+  <p>Here's the counter-current running underneath all this anxiety: disruption is making Australians spiritually hungry. Researchers tracking our faith landscape keep finding the same thing — amid technological upheaval and uncertainty, people are searching for meaning, for community, for something solid, and younger Australians are <em>more</em> open to spiritual conversation than the generations before them. The very forces frightening your people are turning them toward the questions your church exists to answer.</p>
+  <p>The church has been here before. Printing presses, factories, television, the internet — every upheaval prompted the same fears and the same question: is the church still relevant? And every time, the answer was found not in mastering the new technology but in doing the old thing well — a community of real people, anchored to an unchanging Christ, present to their neighbours in the mess.</p>
+  <p>So the preparation this guide asks for isn't really new. Be the room where the fear can be said out loud. Have the pathway ready before it's needed. Guard the meal, the visit, the name remembered. In an anxious, artificial age, an unanxious and genuinely human church might be the most compelling witness there is.</p>
+  <p>And then — having prepared — hold it all loosely. A guide about calming fear can quietly become one more thing to be anxious about getting right. You are not asked to secure the future; you are asked to be faithful in it and to leave the outcome with the God who already holds it. Prepare like it depends on you, and rest like it depends on him. It does.</p>
+</section>
+
+<section>
+  <p class="aside"><strong>Sources, briefly:</strong> the statistics above come from Ipsos's global AI survey, the University of Melbourne and KPMG's <em>Trust in AI</em> global study, Finder and People2people workforce research, the NSW Government's 2026 Youth Week polling, Barna Group's Faith &amp; AI research, and McCrindle's Australian faith landscape studies. Carey Nieuwhof's work on AI and the church — particularly <em>AI and the Future Church</em> — shaped the thinking here and is warmly recommended for leaders who want to go deeper.</p>
+</section>
+
+<footer>
+  <p><span class="fmark">EZER</span> · Helping churches steward what God has given.</p>
+  <p>Questions? <a href="mailto:hello@ezerco.au">hello@ezerco.au</a> · Last reviewed July 2026</p>
+  <p>Everything here is built with AI, directed and owned by Ryan.</p>
+</footer>
+
+</div>
+</body>
+</html>
