@@ -1415,7 +1415,7 @@ function App() {
         email:   p.email,
         source:  "diagnosis-free",
         triage:  p.selectedModules ?? null,
-        answers: { church: p.church ?? null, church_size: p.churchSize || null, state: p.churchState || null, responses: p.answers ?? null, research_consent: p.consent ?? true }
+        answers: { church: p.church ?? null, church_size: p.churchSize || null, state: p.churchState || null, responses: p.answers ?? null, research_consent: p.consent ?? true, ranking: (() => { try { return scoreModules(p.answers ?? {}, p.selectedModules ?? []).map((m) => ({ id: m.id, name: m.name, score: Math.round(m.avg * 10) / 10 })); } catch (_) { return null; } })() }
     });
     if (ok) setSubmitted(true);
     return ok;
