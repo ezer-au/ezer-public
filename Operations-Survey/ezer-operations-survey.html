@@ -91,6 +91,29 @@ const SUPABASE_URL      = "https://itlhvbugfkdkesivxakz.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_Rhz612mwcQ7VDCP7N-OOHg_DmF-jNEb";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+/* Save a lead honestly: retry, keep a local copy if it still fails, report the result. */
+const PENDING_KEY = "ezer_pending_lead";
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function saveLead(row) {
+  for (const wait of [0, 1500, 4000]) {
+    if (wait) await sleep(wait);
+    try {
+      const { error } = await sb.from("leads").insert(row);
+      if (!error) { try { localStorage.removeItem(PENDING_KEY); } catch (_) {} return true; }
+      console.error("EZER lead save failed:", error);
+    } catch (e) { console.error("EZER lead save failed:", e); }
+  }
+  try { localStorage.setItem(PENDING_KEY, JSON.stringify(row)); } catch (_) {}
+  return false;
+}
+/* If an earlier visit couldn't save, quietly try again on page load. */
+(async () => {
+  let pending = null;
+  try { pending = JSON.parse(localStorage.getItem(PENDING_KEY) || "null"); } catch (_) {}
+  if (pending) await saveLead(pending);
+})();
+const SAVE_FAILED_MSG = "Sorry — we couldn't save your answers just now. They're kept on this device, so please try again in a minute, or email hello@ezerco.au.";
+
 /* ─── ACCENT CONTEXT ─── */
 const AccentContext = createContext("#B5643C");
 function useAccent() { return useContext(AccentContext); }
@@ -485,14 +508,19 @@ function Capture({ onSubmit, submitted }) {
   const [church, setChurch] = useState("");
   const [consent, setConsent] = useState(true);
   const [err, setErr] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  const submit = () => {
+  const submit = async () => {
+    if (busy) return;
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setErr("That doesn't look like a valid email — leave it blank if you'd rather not share it.");
       return;
     }
     setErr("");
-    onSubmit({ email, church, consent });
+    setBusy(true);
+    const ok = await onSubmit({ email, church, consent });
+    setBusy(false);
+    if (!ok) setErr(SAVE_FAILED_MSG);
   };
 
   if (submitted) {
@@ -531,7 +559,7 @@ function Capture({ onSubmit, submitted }) {
         </span>
       </label>
 
-      <button onClick={submit} style={{ ...btnPrimary(accent), width: "100%" }}>Submit</button>
+      <button onClick={submit} disabled={busy} style={{ ...btnPrimary(accent), width: "100%", opacity: busy ? 0.6 : 1 }}>{busy ? "Saving…" : "Submit"}</button>
       <p style={{ fontSize: "0.85rem", color: "var(--ink-soft)", textAlign: "center", marginTop: "1.2rem" }}>
         Questions? Email us at{" "}
         <a href={"mailto:" + EZER.contactEmail} style={{ color: accent, fontWeight: 600 }}>{EZER.contactEmail}</a>
@@ -578,8 +606,7 @@ function App() {
   };
 
   const handleSubmit = async ({ email, church, consent }) => {
-    try {
-      const { error } = await sb.from("leads").insert({
+    const ok = await saveLead({
         email: email || null,
         source: "operations-survey",
         triage: null,
@@ -593,10 +620,9 @@ function App() {
           other_data_wanted: feedback || null,
           research_consent: consent ?? true,
         },
-      });
-      if (error) console.error("EZER survey save failed:", error);
-    } catch (e) { console.error("EZER survey save failed:", e); }
-    setSubmitted(true);
+    });
+    if (ok) setSubmitted(true);
+    return ok;
   };
 
   const currentStepNumber = stage === "classify" ? 1 : stage === "module" ? moduleIdx + 2 : totalSteps;
